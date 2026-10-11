@@ -3,6 +3,7 @@ const {contextBridge, ipcRenderer} = require('electron');
 contextBridge.exposeInMainWorld('nanoMonitor', {
   request: (action, method, body) => ipcRenderer.invoke('nano:request', action, method, body),
   previewUrl: 'http://127.0.0.1:8765/preview',
+  thumbnailUrl: 'http://127.0.0.1:8765/thumbnail',
 });
 
 function rendererDetails() {

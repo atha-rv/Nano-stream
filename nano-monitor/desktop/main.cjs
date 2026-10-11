@@ -95,8 +95,8 @@ app.whenReady().then(async () => {
   });
   let latestRender;
   ipcMain.on('nano:render-update', (event, details) => {if (event.sender === window.webContents) latestRender = details;});
-  session.defaultSession.webRequest.onBeforeSendHeaders({urls: ['http://127.0.0.1:8765/preview*']}, (details, callback) => {
-    if (details.webContentsId !== window.webContents.id || new URL(details.url).pathname !== '/preview') return callback({cancel: true});
+  session.defaultSession.webRequest.onBeforeSendHeaders({urls: ['http://127.0.0.1:8765/preview*', 'http://127.0.0.1:8765/thumbnail*']}, (details, callback) => {
+    if (details.webContentsId !== window.webContents.id || !['/preview', '/thumbnail'].includes(new URL(details.url).pathname)) return callback({cancel: true});
     callback({requestHeaders: {...details.requestHeaders, 'X-Nano-Token': bridge.session.token}});
   });
   ipcMain.handle('nano:request', async (event, action, method, body) => {

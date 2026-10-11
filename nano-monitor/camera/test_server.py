@@ -11,6 +11,7 @@ import queue
 import threading
 import pytest
 import gallery
+from thumbnails import ThumbnailCache
 
 
 @pytest.fixture
@@ -43,7 +44,24 @@ def harness(tmp_path):
     clip = SimpleNamespace(name='DJI_20261011120000_0001_D.MP4', size=100,
                            media_path='DCIM/test', storage=1, handle=0x40100001, is_video=True)
     monitor.library_records = {gallery.record_id(clip): clip}
+    monitor.thumbnails = ThumbnailCache(fetch=lambda _: b'thumbnail')
     return monitor, namespace, resources, root, clip
+
+
+def test_thumbnails_require_known_current_session_and_avoid_busy_camera(harness):
+    monitor, _, _, _, clip = harness
+    identifier = gallery.record_id(clip)
+    assert monitor.thumbnail('../arbitrary/path', '0') is None
+    assert monitor.thumbnail(identifier, '999') is None
+    monitor.state['recording'] = True
+    assert monitor.thumbnail(identifier, '0') is None
+    monitor.state['recording'] = False
+    assert monitor.thumbnail(identifier, '0') == b'thumbnail'
+    monitor.state['phase'] = 'disconnected'
+    assert monitor.thumbnail(identifier, '0') == b'thumbnail'
+    monitor.thumbnails.clear()
+    assert monitor.thumbnail(identifier, '0') is None
+    assert monitor.thumbnail(identifier, '1') is None
 
 
 def test_selection_rejects_paths_unknown_ids_and_busy_recording(harness):

@@ -5,8 +5,16 @@ declare global {
     nanoMonitor?: {
       request: (action: string, method: string, body?: object) => Promise<DesktopReply>;
       previewUrl: string;
+      thumbnailUrl?: string;
     };
   }
+}
+
+export function thumbnailUrl(id: string, session: number, retry = 0) {
+  const base = typeof window !== 'undefined' && window.nanoMonitor
+    ? window.nanoMonitor.thumbnailUrl || 'http://127.0.0.1:8765/thumbnail'
+    : '/api/camera/thumbnail';
+  return `${base}?id=${encodeURIComponent(id)}&session=${session}&retry=${retry}`;
 }
 
 export async function cameraRequest(action: string, method = 'GET', body?: object, signal?: AbortSignal) {

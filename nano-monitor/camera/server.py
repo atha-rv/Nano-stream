@@ -12,7 +12,8 @@ import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, parse_qs
+from thumbnails import ThumbnailCache
 
 from live_wire import Assembler, LiveTransport
 from transfer import PacedBleLink, join_with_retry
@@ -48,6 +49,7 @@ class Monitor:
         self.stop_decoder = threading.Event()
         self.cancel_transfer = threading.Event()
         self.library_records = {}
+        self.thumbnails = ThumbnailCache()
         self.gallery = {'status': 'empty', 'items': [], 'complete': False,
                         'warning': None, 'revision': 0, 'pages': 0, 'loadedAt': None}
         self.state = {"phase": "disconnected", "message": "Power on your Nano, then connect.",
@@ -81,7 +83,16 @@ class Monitor:
 
     def gallery_snapshot(self):
         with self.lock:
-            return {**self.gallery, 'items': list(self.gallery['items'])}
+            return {**self.gallery, 'items': list(self.gallery['items']), 'thumbnailSession': self.thumbnails.generation}
+
+    def thumbnail(self, identifier, generation, retry=False):
+        with self.lock:
+            record = self.library_records.get(identifier)
+            if record is None or generation != str(self.thumbnails.generation):
+                return None
+            online = self.state['phase'] in ('live', 'preview_unavailable', 'cataloguing') and not self.state['recording']
+            session = self.thumbnails.generation
+        return self.thumbnails.get(identifier, record, session, online, retry)
 
     def publish_gallery(self, records, pages, **fields):
         destination = Path(storage.status()['destination'])
@@ -122,6 +133,7 @@ class Monitor:
                 self.jpeg = None
                 self.jpeg_time = 0
                 self.library_records = {}
+                self.thumbnails.clear()
                 self.gallery.update(status='empty', items=[], complete=False, warning=None,
                                     revision=self.gallery['revision'] + 1, pages=0, loadedAt=None)
                 self.state.update(phase="connecting", message="Looking for your Nano…", error=None, frames=0)
@@ -554,6 +566,27 @@ class Handler(BaseHTTPRequestHandler):
                 self.reply({'error': str(error)}, 409)
         elif route == '/gallery':
             self.reply(monitor.gallery_snapshot())
+        elif route == '/thumbnail':
+            query = parse_qs(urlsplit(self.path).query)
+            identifiers = query.get('id', [])
+            generations = query.get('session', [])
+            if len(identifiers) != 1 or len(generations) != 1:
+                self.reply({'error': 'Choose a video from the current gallery.'}, 400)
+                return
+            data = monitor.thumbnail(identifiers[0], generations[0], query.get('retry', ['0']) != ['0'])
+            if data is None:
+                self.reply({'error': 'Thumbnail unavailable. Connect the camera and retry.'}, 404)
+                return
+            self.send_response(200)
+            self.send_header('Content-Type', 'image/jpeg')
+            self.send_header('Cache-Control', 'no-store')
+            self.send_header('X-Content-Type-Options', 'nosniff')
+            self.send_header('Content-Length', str(len(data)))
+            self.end_headers()
+            try:
+                self.wfile.write(data)
+            except (BrokenPipeError, ConnectionResetError):
+                pass
         elif route == "/preview":
             self.send_response(200)
             self.send_header("Content-Type", "multipart/x-mixed-replace; boundary=nano")

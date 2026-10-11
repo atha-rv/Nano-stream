@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1 — 2026-10-11
+
+- Show camera thumbnails in desktop and phone gallery rows, with lazy loading,
+  a visible unavailable fallback and Retry previews.
+- Restrict preview requests to known gallery IDs and the current camera session;
+  bound concurrent camera requests, image size and memory cache usage.
+- Verify five JPEG previews on the actual Nano and failure/retry in the UI.
+
 ## 0.2.0 — 2026-10-11
 
 - Add desktop camera gallery with older-page retrieval, Today/Past 7 days/Last

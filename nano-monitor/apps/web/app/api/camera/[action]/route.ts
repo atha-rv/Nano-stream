@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { NextRequest, NextResponse } from 'next/server';
 
-const actions = new Set(['state', 'preview', 'connect', 'start', 'stop', 'disconnect', 'folder', 'storage', 'gallery', 'gallery_refresh', 'download', 'cancel']);
+const actions = new Set(['state', 'preview', 'thumbnail', 'connect', 'start', 'stop', 'disconnect', 'folder', 'storage', 'gallery', 'gallery_refresh', 'download', 'cancel']);
 
 async function proxy(request: NextRequest, context: {params: Promise<{action: string}>}) {
   const {action} = await context.params;
@@ -24,7 +24,8 @@ async function proxy(request: NextRequest, context: {params: Promise<{action: st
     const file = process.env.NANO_BRIDGE_SESSION || resolve(process.cwd(), '../../../.research/nano-bridge-session.json');
     const session = JSON.parse(await readFile(file, 'utf8')) as {port: number; token: string};
     if (session.port !== 8765 || typeof session.token !== 'string') throw new Error('Invalid bridge session');
-    const upstream = await fetch(`http://127.0.0.1:8765/${action}`, {
+    const query = action === 'thumbnail' ? request.nextUrl.search : '';
+    const upstream = await fetch(`http://127.0.0.1:8765/${action}${query}`, {
       method: request.method,
       headers: {'X-Nano-Token': session.token, 'Content-Type': 'application/json'},
       body: body || undefined,

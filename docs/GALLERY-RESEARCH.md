@@ -33,7 +33,7 @@ undocumented interface.
 
 For selection, reuse React, the existing Base UI Button wrapper and a native
 modal HTML dialog. No gallery framework or new runtime dependency is needed
-for filename/date/size selection. Thumbnail playback is outside this change.
+for filename/date/size selection. Clip playback is outside this change.
 Native browser file APIs suffice for the standalone approval foundation; saving
 has a download fallback when File System Access is unavailable. Helvetica is not
 redistributed; system Arial/sans-serif is the fallback until a licensed approved
@@ -52,3 +52,32 @@ No dependencies changed for this feature. Existing desktop audit on this date
 reported zero known advisories; the retained web/build stack still has the
 documented unpatched braces advisory. This is dated evidence, not permanent
 approval for redistributing every future upstream version.
+
+## Thumbnail follow-up — 2026-10-11
+
+Inspected pinned Osmosis `PathAddressing.kt`, `ImageLoader.kt`, manifest parsing
+and addressing tests, and pinned OsmoOffload `CameraHttp.fetch_small` plus its Qt controller's
+`_fetch_thumbs` implementation. That complete desktop flow uses the same
+sidecars but writes thumbnails under its configuration folder; this app uses
+bounded memory to respect the footage-storage preference. Rechecked
+Osmosis maintenance/license/open issues: MIT, unarchived, last push September
+17; the open issues inspected concern other models/drone integration. Its
+Android bitmap/UI runtime is not appropriate for Electron. Reuse the established
+`.scr` then `.thm` camera-sidecar addressing and native browser image decoding;
+no additional image library or dependency is required. The retained MIT license
+covers the reference adaptation; upstream tests were inspected, not run.
+
+Only known gallery IDs from the current session resolve to camera thumbnail
+paths. Requests retain the private bridge header, reject arbitrary media paths,
+cap each JPEG at 512 KB, allow two camera HTTP tasks at a time, and cache at most
+16 MB/128 entries in memory. Session reset prevents stale requests populating
+another camera's cache. No original footage is fetched to construct thumbnails.
+Offline cached previews remain usable; unavailable images retain selection and
+have an explicit retry action. Missing/invalid renditions are not camera errors.
+
+Hardware check: all five selected actual Nano previews returned JPEGs (24–112 KB)
+and decoded in the browser at 1280×720. Unauthorized requests returned 403;
+unknown gallery IDs returned 404. The camera session disconnected normally.
+Browser tests used a local fixture with these real previews; fallback/retry,
+keyboard selection, Escape/focus return and phone layout were checked separately.
+Other firmware and all 48 thumbnails were not verified.

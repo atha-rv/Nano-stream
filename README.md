@@ -9,6 +9,7 @@ Experimental Windows camera integration, tested with one Osmo Nano. This project
 - Wireless framing preview, camera **Record** and **Stop & save** controls.
 - Original-resolution video and audio copied after a recording stops. The preview is 1280×720, with no monitoring audio.
 - **Download videos** opens the camera library and requests older pages. Select **Recorded today**, **Past 7 days**, **Last 5**, **Last 10**, **All**, or a custom date range; then tick/untick individual videos.
+- Camera thumbnails appear beside each clip, loading as you browse without downloading originals. **Retry previews** reloads unavailable images. The memory cache is capped at 16 MB/128 previews; thumbnails do not create a footage cache on C:.
 - **Automatic** storage preference: connected external USB drive first, otherwise `D:\Osmo Nano`. Optional **Always D:** or a specific USB override.
 - Originals stored as `<destination>\Nano\<date>\video\`. Each download creates a chronological `batch.json` with recording dates, local paths, copy status and available duration/resolution metadata.
 - Drive identity, available space and FAT32 size checks. Removing a drive interrupts its active transfer; fallback applies to the next transfer. Originals remain on the camera.

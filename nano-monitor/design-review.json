@@ -53,5 +53,16 @@
     "foundation": "Local PNG import starts pending; approval/notes edited in browser; save success feedback observed. Serializer round-trips script-like text/asset approval data safely. Saved-copy reload, fallback browser downloads and supplied-font rendering not fully verified. Public template remains empty.",
     "hardware": "One Nano returned 48 videos across two pages and reported complete. Two selected 4K originals copied to E:; chronological complete batch produced, FFmpeg fully decoded both and normal Wi-Fi restored. Local small.en transcribed both into source-adjacent word-timed JSON and batch story-intake on E:.",
     "critique": "Separate screenshot review after selection checks: wrapped filenames, clear selection counts and destination, fixed download footer, filter rows wrap on phone. Removed duplicate body scrollbar while modal is open. Future video styling is restrained white/pink, independent of the camera app identity."
+  },
+  "gallery_thumbnails": {
+    "date": "2026-10-11",
+    "outcome": "Recognize and select clips visually without transferring originals or writing a footage cache to C:.",
+    "research": "Inspected pinned MIT Osmosis ImageLoader/PathAddressing/manifest source and test paths plus OsmoOffload CameraHttp.fetch_small. Reuse camera screennails and native img; no new dependencies. Retained upstream license; rechecked maintenance and open issues.",
+    "hardware": "One Nano, 48-video gallery. Five selected small screennails returned image/jpeg, 24\u2013112 KB, all decoded at 1280x720. Unauthorized 403 and unknown ID 404. No full videos downloaded. Disconnected normally. All 48 previews/other firmware unverified.",
+    "functional": "25 Python and 6 Node tests passed; TypeScript passed. Unit checks cover safe sidecar paths, bounded response reads, non-image rejection, storage fallback, cache eviction/offline use, manual retry, old-session in-flight isolation and current-ID/busy-camera access.",
+    "desktop": "Browser fixture with actual camera metadata and five actual preview files. Verified five decoded images; filters retained. Fixture missing-image fallback then Retry previews loaded an image. Space deselected checkbox and disabled download; Escape returned focus to Download videos.",
+    "phone": "Requested 350x800 viewport, actual DOM 389 CSS px; scrollWidth 389. Thumbnails remain visible at 88x64; all dialog buttons 44px high. Long filenames wrap; download footer remains visible. Native cold-start smoke separately checks effective 322px width. Enlarged text not verified.",
+    "separate_critique": "After functional checks, inspected desktop and phone screenshots. Reduced duplicated help and grouped Retry previews beside Refresh library so the clip list starts sooner. Preserved letterboxing for camera framing; some actual previews are nearly black, distinct from unavailable fallback.",
+    "limits": "Browser failure recovery uses fixtures. Native thumbnail header path inspected; end-to-end native gallery interaction not automated. Existing preview-resume limitation and other gallery verification limits remain recorded above."
   }
 }
