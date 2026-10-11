@@ -177,11 +177,16 @@ class Monitor:
             self.state.update(phase="pending", message={"start": "Starting recording…", "stop": "Stopping and saving…", "disconnect": "Disconnecting…"}[action])
             self.commands.put(action)
 
-    def copy_records(self, records, credentials, label, cancellable=False):
+    def copy_records(self, records, credentials, label, cancellable=False, datalink=None):
         """Share original-file transfer with Stop and selected gallery downloads."""
         db, http, manifest_path, manifest = None, None, None, None
         completed = []
         try:
+            # The main pump cannot service UDP while HTTP copies are blocking.
+            # Reuse upstream's presence/status/ACK worker to hold the camera AP
+            # through planning, prefix hashing, downloads and retry delays.
+            if datalink:
+                datalink.start_keepalive()
             destination = storage.check()
             records = chronological(records)
             destinations = set()
@@ -195,7 +200,10 @@ class Monitor:
             http = CameraHttp('192.168.2.1')
             guard_downloads(http, destination)
             off = Offloader(OffloadConfig(base_dir=destination, camera_folder='Nano', kinds=('video',)), db, http)
-            off.on_network_lost = lambda: wifi.rejoin_sync(credentials.ssid)
+            def recover_network():
+                self.update(message='Camera connection interrupted. Rejoining and resuming the saved partial file…')
+                wifi.rejoin_sync(credentials.ssid)
+            off.on_network_lost = recover_network
             plan = off.plan(records)
             conflicts = []
             for item in plan:
@@ -223,11 +231,13 @@ class Monitor:
                         write_json(manifest_path, manifest)
                         journalled.add(copied['dest_path'])
                 current_bytes = 0 if completed and completed[-1]['original'] == value.current_name else value.current_done
-                self.update(progress=min(100, round(100 * (value.done_bytes + current_bytes) / max(value.total_bytes, 1))),
+                self.update(message='Copying camera originals. Partial downloads resume automatically.',
+                            progress=min(100, round(100 * (value.done_bytes + current_bytes) / max(value.total_bytes, 1))),
                             transfer={'totalFiles': value.total_files, 'doneFiles': value.done_files,
                                       'selectedCount': len(records), 'currentName': value.current_name,
                                       'bytesDone': value.done_bytes + current_bytes,
                                       'totalBytes': value.total_bytes, 'batchPath': str(manifest_path)})
+            self.update(message='Checking any saved partial files before resuming. Large files can take a moment…')
             result = off.run(plan, progress, cancelled=self.cancel_transfer.is_set if cancellable else None)
             completed[:] = result.results
             for copied in completed:
@@ -252,6 +262,10 @@ class Monitor:
                         row.update(status='failed', note='Not completed: ' + str(error))
             raise
         finally:
+            # Return exclusive socket ownership to the live pump before it
+            # restores preview or closes the session, including failure/cancel.
+            if datalink:
+                datalink.stop_keepalive()
             # Close transfer resources even if the selected drive disappeared
             # or persisting the local batch index fails.
             if db:
@@ -433,7 +447,7 @@ class Monitor:
                         continue
                     dl.enter_playback()
                     try:
-                        batch = self.copy_records(command[1], credentials, command[2], cancellable=True)
+                        batch = self.copy_records(command[1], credentials, command[2], cancellable=True, datalink=dl)
                         failed = batch['status'] == 'partial'
                         self.update(message='Download cancelled. Completed originals are kept.' if batch['status'] == 'cancelled' else
                                     'Some selected files were not copied. Check the batch details and retry.' if failed else
@@ -457,7 +471,7 @@ class Monitor:
                     new = [record for record in records if record.is_video and record.media_path not in known]
                     if not new:
                         raise RuntimeError("Recording stopped, but the new file was not listed. It remains on the camera; use Download New Videos to retry.")
-                    result = self.copy_records(new, credentials, 'Finished recording')
+                    result = self.copy_records(new, credentials, 'Finished recording', datalink=dl)
                     if result['status'] != 'complete':
                         raise RuntimeError('Some recordings could not be copied. They remain on the camera; select them in Download videos to retry.')
                     known.update(record.media_path for record in records)

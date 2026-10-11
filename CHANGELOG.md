@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.3 — 2026-10-11
+
+- Hold the Nano datalink presence/ACK keepalive throughout blocking original
+  transfers, including gallery downloads and Stop & save. Release it on success,
+  cancellation and errors before restoring preview.
+- Show connection recovery, partial-file preparation and byte counts during
+  downloads. Existing partial files resume without discarding received footage.
+- Verify a previously interrupted 2.39 GB recording resumed from 715 MB to
+  completion on USB, including recovery from another connection interruption.
+
 ## 0.2.2 — 2026-10-11
 
 - Populate the standalone editing foundation with six editable, approvable

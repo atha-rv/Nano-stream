@@ -86,12 +86,19 @@ def test_selection_rejects_paths_unknown_ids_and_busy_recording(harness):
 def test_completed_files_are_journalled_and_resources_closed(harness, interrupt):
     monitor, namespace, resources, root, clip = harness
     target = gallery.safe_destination(clip, root)
+    events = []
+    datalink = SimpleNamespace(start_keepalive=lambda: events.append('start'),
+                               stop_keepalive=lambda: events.append('stop'))
     class Offloader:
         def __init__(self, *args):
             pass
         def plan(self, records):
+            assert events == ['start']  # Probing also needs a held camera AP.
             return [SimpleNamespace(record=clip, dest=target, skipped=None, size=100)]
         def run(self, plan, progress, **kwargs):
+            assert events == ['start']
+            self.on_network_lost()
+            assert 'resuming' in monitor.state['message']
             target.parent.mkdir(parents=True)
             target.write_bytes(b'x' * 100)
             copied = {'original': clip.name, 'dest_path': str(target), 'hash': 'fixture-hash', 'size': 100}
@@ -99,6 +106,7 @@ def test_completed_files_are_journalled_and_resources_closed(harness, interrupt)
                                     total_bytes=100, total_files=1, done_files=1,
                                     current_name=clip.name, failures=[])
             progress(value)
+            assert 'Copying' in monitor.state['message']
             assert monitor.state['transfer']['bytesDone'] == 100
             journal = json.loads(next(root.rglob('batch.json')).read_text())
             assert journal['files'][0]['status'] == 'downloaded'
@@ -108,12 +116,54 @@ def test_completed_files_are_journalled_and_resources_closed(harness, interrupt)
     namespace['Offloader'] = Offloader
     if interrupt:
         with pytest.raises(OSError):
-            monitor.copy_records([clip], SimpleNamespace(ssid='test'), 'Today', True)
+            monitor.copy_records([clip], SimpleNamespace(ssid='test'), 'Today', True, datalink)
     else:
-        assert monitor.copy_records([clip], SimpleNamespace(ssid='test'), 'Today')['status'] == 'complete'
+        assert monitor.copy_records([clip], SimpleNamespace(ssid='test'), 'Today', datalink=datalink)['status'] == 'complete'
+    assert events == ['start', 'stop']
     assert all(resource.closed for resource in resources)
     batch = json.loads(next(root.rglob('batch.json')).read_text())
     assert batch['files'][0]['status'] == 'downloaded'
     assert batch['status'] == ('partial' if interrupt else 'complete')
     assert target.read_bytes() == b'x' * 100
     assert monitor.state['saved'][0]['dest_path'] == str(target)
+
+
+def test_transfer_keepalive_stops_on_preflight_failure(harness):
+    monitor, namespace, _, _, clip = harness
+    events = []
+    datalink = SimpleNamespace(start_keepalive=lambda: events.append('start'),
+                               stop_keepalive=lambda: events.append('stop'))
+    def unavailable(*args, **kwargs):
+        assert events == ['start']
+        raise ValueError('USB unavailable')
+    namespace['storage'].check = unavailable
+    with pytest.raises(ValueError, match='USB unavailable'):
+        monitor.copy_records([clip], SimpleNamespace(ssid='test'), 'Today', datalink=datalink)
+    assert events == ['start', 'stop']
+
+
+def test_cancelled_transfer_preserves_partial_and_releases_keepalive(harness):
+    monitor, namespace, _, root, clip = harness
+    target = gallery.safe_destination(clip, root)
+    target.parent.mkdir(parents=True)
+    partial = target.with_suffix('.MP4.part')
+    partial.write_bytes(b'saved prefix')
+    events = []
+    datalink = SimpleNamespace(start_keepalive=lambda: events.append('start'),
+                               stop_keepalive=lambda: events.append('stop'))
+    class Offloader:
+        def __init__(self, *args):
+            pass
+        def plan(self, records):
+            return [SimpleNamespace(record=clip, dest=target, skipped=None, size=100)]
+        def run(self, plan, progress, cancelled):
+            assert events == ['start']
+            monitor.cancel_transfer.set()
+            assert cancelled()
+            return SimpleNamespace(results=[], failures=['cancelled'])
+    namespace['Offloader'] = Offloader
+    batch = monitor.copy_records([clip], SimpleNamespace(ssid='test'), 'Today', True, datalink)
+    assert batch['status'] == 'cancelled'
+    assert events == ['start', 'stop']
+    assert partial.read_bytes() == b'saved prefix'
+    assert not target.exists()

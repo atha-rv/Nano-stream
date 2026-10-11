@@ -81,3 +81,28 @@ unknown gallery IDs returned 404. The camera session disconnected normally.
 Browser tests used a local fixture with these real previews; fallback/retry,
 keyboard selection, Escape/focus return and phone layout were checked separately.
 Other firmware and all 48 thumbnails were not verified.
+
+### Large-download stall repair — 2026-10-11
+
+The live pump serviced presence and transport ACKs inline. Both gallery copying
+and Stop & save called the blocking HTTP offloader, suspending those heartbeats.
+User logs showed AP loss on a large original and an unchanged partial at 30%.
+Reuse the already pinned OsmoOffload `CameraDatalink.start_keepalive()` and
+`stop_keepalive()` around the entire transfer, including HEAD planning, partial
+prefix hashing and HTTP retry waits. Upstream's own controller holds this same
+worker through its HTTP phase:
+https://github.com/intermittech/OsmoOffload/blob/9c5bad9cadcc3fecd402a4bddef7a52d8b2ad54f/src/osmooffload/ui/controller.py
+No new dependency or copy of the upstream protocol implementation was needed.
+Stop the keepalive in `finally` before the main pump resumes exclusive socket
+ownership; keep recording actions serialized. The existing Wi-Fi rejoin hook
+and Range resume remain in use. Recovery text and bytes are visible inside the
+gallery instead of being obscured behind its modal.
+
+Hardware evidence: a 2,391,154,605-byte 4K original resumed from its preserved
+715,128,832-byte partial to a complete USB file and complete batch manifest.
+A further reset near 2.25 GB recovered with rejoin and resume. Normal Wi-Fi was
+restored afterward. Camera size and the local receive hash were checked; no
+independent camera checksum is supplied by this protocol. Regression checks
+cover keepalive during planning/copying, cleanup after preflight/copy failures,
+cancellation preserving partial bytes and network recovery status. Hardware
+validation used the gallery route; a new Record/Stop cycle was not requested.

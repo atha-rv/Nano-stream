@@ -58,7 +58,7 @@
     "date": "2026-10-11",
     "outcome": "Recognize and select clips visually without transferring originals or writing a footage cache to C:.",
     "research": "Inspected pinned MIT Osmosis ImageLoader/PathAddressing/manifest source and test paths plus OsmoOffload CameraHttp.fetch_small. Reuse camera screennails and native img; no new dependencies. Retained upstream license; rechecked maintenance and open issues.",
-    "hardware": "One Nano, 48-video gallery. Five selected small screennails returned image/jpeg, 24\u2013112 KB, all decoded at 1280x720. Unauthorized 403 and unknown ID 404. No full videos downloaded. Disconnected normally. All 48 previews/other firmware unverified.",
+    "hardware": "One Nano, 48-video gallery. Five selected small screennails returned image/jpeg, 24–112 KB, all decoded at 1280x720. Unauthorized 403 and unknown ID 404. No full videos downloaded. Disconnected normally. All 48 previews/other firmware unverified.",
     "functional": "25 Python and 6 Node tests passed; TypeScript passed. Unit checks cover safe sidecar paths, bounded response reads, non-image rejection, storage fallback, cache eviction/offline use, manual retry, old-session in-flight isolation and current-ID/busy-camera access.",
     "desktop": "Browser fixture with actual camera metadata and five actual preview files. Verified five decoded images; filters retained. Fixture missing-image fallback then Retry previews loaded an image. Space deselected checkbox and disabled download; Escape returned focus to Download videos.",
     "phone": "Requested 350x800 viewport, actual DOM 389 CSS px; scrollWidth 389. Thumbnails remain visible at 88x64; all dialog buttons 44px high. Long filenames wrap; download footer remains visible. Native cold-start smoke separately checks effective 322px width. Enlarged text not verified.",
@@ -76,5 +76,14 @@
     "persistence": "Updated personal USB HTML from saved source with a recoverable backup and retained existing asset/notes data. JSON and script parse verified. Three focused source/serializer tests pass, including script-like note escaping, initial proposal approvals and enabled Save on exported copies. Native browser save picker did not complete during the test; that path is unverified. Personal original file tab left untouched after browser security blocked file:// access.",
     "separate_critique": "After functional checks, reviewed desktop and 303px screenshots. Added direct approval beside the selected preview instead of requiring a scroll to approve; retained focus when card approval buttons are regenerated. Added constrained-wording feedback, preserved caption legibility, moved portrait content inside documented text-safe margins and kept video controls clickable under the caption scene.",
     "limits": "Public-template HTTP fixture used for browser checks; direct file-tab reload, saved-copy reopening, native picker completion, supplied-font rendering and enlarged-text settings are not verified. Pixel render output is outside this task."
+  },
+  "download_stall_fix": {
+    "date": "2026-10-11",
+    "cause": "Blocking HTTP transfers suspended inline UDP presence/ACK servicing; reuse upstream keepalive for the full copy lifecycle.",
+    "hardware": "Interrupted 2.39 GB original resumed from a 715 MB USB partial to a complete manifest/file; recovered a further reset with Wi-Fi rejoin and resume. Normal Wi-Fi restored.",
+    "tests": "27 Python and 7 Node checks; TypeScript check and rebuilt Electron cold smoke passed. Keepalive lifecycle, cancellation preserving partials and recovery feedback covered.",
+    "ui": "Browser fixture shows recovery text and byte counts in gallery footer. Actual phone DOM width 356 CSS px with no horizontal overflow and 44px cancel/download controls. Cancel returns to usable selection controls.",
+    "critique": "Separate phone screenshot review: recovery words wrap inside the fixed footer; progress and cancel remain visible, content scrolls above it. Desktop status inspected through accessibility state.",
+    "limits": "New Record/Stop hardware cycle and deliberate physical USB removal not tested. Some brief camera connection resets may still occur and use existing retries."
   }
 }
