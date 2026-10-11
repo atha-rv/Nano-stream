@@ -1,16 +1,66 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "updatedAt": "2026-10-11",
   "approval": "User-approved standing direction",
   "deliverables": {
-    "youtube": {"aspectRatio": "16:9", "resolution": "Preserve useful source resolution", "style": "Understated, speech-led"},
-    "instagram": {"aspectRatio": "9:16", "resolution": "1080x1920", "selection": "Self-contained strong moments from the same sources; at least one when usable material permits"},
+    "youtube": {
+      "aspectRatio": "16:9",
+      "resolution": "Preserve useful source resolution",
+      "style": "Understated, speech-led"
+    },
+    "instagram": {
+      "aspectRatio": "9:16",
+      "resolution": "1080x1920",
+      "selection": "Self-contained strong moments from the same sources; at least one when usable material permits"
+    },
     "captions": "Readable verbatim captions; optional on YouTube, included on Reels unless the user requests otherwise"
   },
-  "typography": {"family": "Helvetica", "fallbacks": ["Arial", "sans-serif"], "fontFiles": "Use a supplied licensed font asset when available; never claim a fallback is Helvetica", "colour": "#FFFFFF", "weight": 500, "legibility": "Subtle shadow or restrained backing only when footage requires it"},
-  "accent": {"colour": "#FF2DAA", "name": "Neon pink", "usage": "Optional funky variation, used sparingly; white remains the default"},
-  "motion": {"default": "Static typography, clean cuts or a short soft fade", "purpose": "Clarify the spoken point", "avoid": ["Software-dashboard cards", "Monospace tech headings", "Neon HUDs", "Decorative counters", "Flashy transitions", "Unnecessary animated graphics"]},
-  "editing": {"pacing": "Tighten dead space without cutting words or flattening the speaker's delivery", "colour": "Natural and restrained", "audio": "Clear, even voice levels", "originals": "Untouched", "storage": "Source-adjacent edit folder on external USB or D:; never put new media caches on C:"},
-  "assets": {"policy": "User-added references begin pending; only explicitly approved assets are reusable style sources", "approved": []},
-  "workflow": "Every requested video or chronological dump normally produces a YouTube edit plus vertical Reels using this foundation. Inspect the actual footage and speech. Do not infer a good story from date order alone."
+  "typography": {
+    "family": "Helvetica",
+    "fallbacks": [
+      "Arial",
+      "sans-serif"
+    ],
+    "fontFiles": "Use a supplied licensed font asset when available; never claim a fallback is Helvetica",
+    "colour": "#FFFFFF",
+    "weight": 500,
+    "legibility": "Subtle shadow or restrained backing only when footage requires it"
+  },
+  "accent": {
+    "colour": "#FF2DAA",
+    "name": "Neon pink",
+    "usage": "Pink check marks, bullets, short underlines/rules and occasional meaningful numbers on white graphic cards. Body words stay dark; footage captions stay white. Avoid all-pink paragraphs and karaoke word highlights."
+  },
+  "motion": {
+    "default": "Static typography, clean cuts or a short soft fade",
+    "purpose": "Clarify the spoken point",
+    "avoid": [
+      "Software-dashboard cards",
+      "Monospace tech headings",
+      "Neon HUDs",
+      "Decorative counters",
+      "Flashy transitions",
+      "Unnecessary animated graphics"
+    ]
+  },
+  "editing": {
+    "pacing": "Tighten dead space without cutting words or flattening the speaker's delivery",
+    "colour": "Natural and restrained",
+    "audio": "Clear, even voice levels",
+    "originals": "Untouched",
+    "storage": "Source-adjacent edit folder on external USB or D:; never put new media caches on C:"
+  },
+  "assets": {
+    "policy": "User-added references begin pending; only explicitly approved assets are reusable style sources",
+    "approved": []
+  },
+  "workflow": "Every requested video or chronological dump normally produces a YouTube edit plus vertical Reels using this foundation. Inspect the actual footage and speech. Do not infer a good story from date order alone.",
+  "graphics": {
+    "background": "#FFFFFF",
+    "text": "#202020",
+    "font": "Helvetica, Arial, sans-serif",
+    "layouts": "Pink-tick checklist, section title, takeaway, key number and Reel opener are concrete proposals in the foundation HTML; reuse only approved layouts. Plain white footage captions are already approved.",
+    "density": "One point per card; at most three short checklist lines. Generous white space.",
+    "motion": "Static or a short soft fade; no bouncing ticks, HUDs, count-ups or decorative tech panels."
+  }
 }

@@ -10,22 +10,39 @@ or social uploads. One landscape edit was completed outside this repository.
 The default brief for every video/dump given to Codex is a YouTube landscape
 edit **plus usable vertical Instagram Reels from the same originals**. White
 Helvetica-style text (Arial/sans-serif fallback), natural voice/colour and
-restrained graphics are approved. Neon pink **#FF2DAA** is optional for a playful
-moment. Avoid software dashboards, monospace headings and flashy decoration.
+restrained graphics are approved. Graphic cards use **white backgrounds, dark
+words and neon pink #FF2DAA ticks, bullets, short rules or small meaningful
+accents**. Footage captions stay white. Avoid software dashboards, monospace
+headings, all-pink paragraphs, karaoke highlights and flashy decoration.
 The earlier green workflow graphic felt too techy; that is feedback for future
 edits, not a request to rerender the completed cut.
 
 ### Approved foundation HTML
 
-Open `nano-monitor/design/editing-foundation.html` in a browser. Preview white or
-pink type over a local video/image, with landscape/portrait toggles. Add images,
+Open `nano-monitor/design/editing-foundation.html` in a browser. It contains six
+editable examples: pink-tick checklist, section title, takeaway, key number,
+plain footage caption and Reel opener. Switch landscape/portrait, change sample
+words, check text-safe guides, and approve layouts for reuse. White captions are
+already approved; the five new layouts start as proposals. Pink changes marks
+on white cards, while captions remain white. Long wording gets a fit warning.
+Import a local video/image to preview captions. Add images,
 licensed fonts or sounds, approve assets and write reuse notes. New files start
 **pending**. Save a personal HTML copy on USB/D: and give it to the editor. Assets,
-approvals and notes are embedded in that copy; preview footage is session-only.
+approvals and notes are embedded in that copy, together with recipe wording,
+layout rules and reusable vector marks; preview footage is session-only.
 Save after each change and reopen the copy to confirm. Browsers without File
 System Access download an HTML instead; choose USB/D: as its destination. The
 public template has no personal assets, makes no network requests and includes
 no Helvetica font files. Keep personal copies outside Git.
+
+The standalone page reuses the installed Lucide/Feather check SVG from
+`lucide-react@1.28.0`, tag revision
+`240118e52162d710babd44d0452dd9a1862f1e1d`. Its ISC/MIT notices are embedded.
+The inspected [Lucide source](https://github.com/lucide-icons/lucide/tree/240118e52162d710babd44d0452dd9a1862f1e1d)
+is maintained, with an October 10 push at inspection. The React runtime is not
+loaded by this page: native HTML, CSS and SVG suffice for an offline reference.
+No dependency or web font was added. Layouts are static style references,
+not renderable timed video compositions or an automatic editing engine.
 
 ### Prepare a camera dump
 

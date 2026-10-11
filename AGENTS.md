@@ -29,3 +29,8 @@ only when explicitly approved; pending uploads are references. Review all usable
 clips and transcripts before choosing the story. Do not force multiple Reels
 from footage supporting only one. Preserve originals and keep edit caches on
 their USB/D: volume. Never publish personal foundations/assets/transcripts.
+
+Clarified visual direction (2026-10-11): white graphic backgrounds with dark
+Helvetica/Arial-style words; neon pink is for ticks, bullets, short rules and
+small meaningful accents. Footage captions stay white. Read the saved HTML
+recipe approvals: proposed layouts are references until approved.

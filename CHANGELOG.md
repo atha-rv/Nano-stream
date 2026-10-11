@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.2 — 2026-10-11
+
+- Populate the standalone editing foundation with six editable, approvable
+  layouts and reusable vector marks for YouTube and Reels.
+- Clarify white graphic cards, dark words and pink ticks/small accents;
+  footage captions remain white. Add text-safe guides and wording-fit feedback.
+- Preserve asset import/approval and embedded save state; fix saved copies
+  retaining a disabled Save button. Personal USB copies stay outside Git.
+
 ## 0.2.1 — 2026-10-11
 
 - Show camera thumbnails in desktop and phone gallery rows, with lazy loading,

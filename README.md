@@ -15,7 +15,7 @@ Experimental Windows camera integration, tested with one Osmo Nano. This project
 - Drive identity, available space and FAT32 size checks. Removing a drive interrupts its active transfer; fallback applies to the next transfer. Originals remain on the camera.
 - Connection instructions, pairing approval feedback, stale-preview warnings and Wi-Fi restoration on normal disconnect.
 - Editing helper to keep outputs, temporary files and supported media caches beside the selected footage.
-- Standalone [editing foundation HTML](nano-monitor/design/editing-foundation.html) for previewing restrained white type, optional neon pink, and adding approved assets/notes. Save a personal copy on USB or D:.
+- Standalone [editing foundation HTML](nano-monitor/design/editing-foundation.html) with six editable layout examples: white graphic cards, dark type, pink ticks/small accents, and white footage captions. Approve layouts/assets, check 16:9 and 9:16 previews, and save a personal copy on USB or D:.
 
 The integrated daily YouTube/Reels editor is **planned**, not a current app feature. A landscape edit has been produced using separate local editing tools; this repository does not include personal videos or transcripts. See [the daily editing workflow](docs/DAILY-EDITING.md).
 
