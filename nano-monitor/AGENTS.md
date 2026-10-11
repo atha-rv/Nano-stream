@@ -49,3 +49,13 @@ These rules record the user's preferences for applications built in this workspa
 - Distinguish source inspection, dependency advisory checks, local tests, sandbox integration tests, and production verification.
 - Do not claim the backend is ready merely because a template has been downloaded. Service accounts, credentials, products, webhooks, and deployment still need configuration.
 - Run meaningful checks for authentication, cross-user access, billing, and the product's critical workflow. Present a working preview and explain any unverified external integrations.
+
+## Standing editing brief
+When given a video or camera dump to edit, deliver a YouTube landscape edit plus
+vertical Instagram Reels from the same original footage. Read
+`design/editing-style.json` and the user's saved editing-foundation HTML first.
+Use restrained white Helvetica/Arial-style type by default; optional neon pink
+only when the mood suits it. Avoid software dashboards, monospace tech headings
+and flashy decorations. Pending assets are references, not approved for reuse.
+Review speech and visuals across the whole dump for a coherent story; recording
+order alone does not establish a story. Keep all new media/caches on USB or D:.

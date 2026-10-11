@@ -26,6 +26,8 @@ from osmooffload.core.mp4meta import probe
 from osmooffload.history import HistoryDB
 from osmooffload.net import wifi
 from osmooffload.net.downloader import CameraHttp
+from gallery import (GalleryError, chronological, entry, make_batch, query_page,
+                     record_id, safe_destination, walk_library, write_json)
 
 WORKSPACE = Path(__file__).resolve().parents[2]
 SESSION_FILE = WORKSPACE / ".research" / "nano-bridge-session.json"
@@ -44,9 +46,14 @@ class Monitor:
         self.decoder = None
         self.feed = queue.Queue(maxsize=50)
         self.stop_decoder = threading.Event()
+        self.cancel_transfer = threading.Event()
+        self.library_records = {}
+        self.gallery = {'status': 'empty', 'items': [], 'complete': False,
+                        'warning': None, 'revision': 0, 'pages': 0, 'loadedAt': None}
         self.state = {"phase": "disconnected", "message": "Power on your Nano, then connect.",
                       "recording": False, "battery": None, "saved": [], "error": None,
-                      "destination": storage.status()['destination'], "progress": None, "frames": 0}
+                      "destination": storage.status()['destination'], "progress": None, "frames": 0,
+                      'transfer': None, 'batches': []}
         try:
             storage.refresh()
         except ValueError:
@@ -68,7 +75,21 @@ class Monitor:
         with self.lock:
             location = storage.status()
             return {**self.state, "storage": location, "destination": location['destination'],
+                    'gallery': {k: v for k, v in self.gallery.items() if k != 'items'},
+                    'galleryCount': len(self.gallery['items']),
                     "previewAge": time.monotonic() - self.jpeg_time if self.jpeg_time else None}
+
+    def gallery_snapshot(self):
+        with self.lock:
+            return {**self.gallery, 'items': list(self.gallery['items'])}
+
+    def publish_gallery(self, records, pages, **fields):
+        destination = Path(storage.status()['destination'])
+        videos = [record for record in records if record.is_video]
+        items = [entry(record, destination) for record in reversed(chronological(videos))]
+        with self.lock:
+            self.library_records = {record_id(record): record for record in videos}
+            self.gallery.update(items=items, pages=pages, revision=self.gallery['revision'] + 1, **fields)
 
     def choose_storage(self, volume_id):
         with self.lock:
@@ -77,13 +98,19 @@ class Monitor:
             storage.choose(volume_id)
             self.state.update(message='Save location updated. New recordings will go here.', error=None)
 
-    def action(self, action):
+    def action(self, action, body=None):
         with self.lock:
             phase = self.state["phase"]
+            if action == 'cancel':
+                if phase not in ('cataloguing', 'downloading'):
+                    raise ValueError('There is no library scan or download to cancel.')
+                self.cancel_transfer.set()
+                self.state.update(message='Cancelling safely. Completed files and camera originals are kept.')
+                return
             if action == 'close':
                 if not self.worker or not self.worker.is_alive():
                     return
-                if phase in ('connecting', 'pending', 'saving', 'disconnecting'):
+                if phase in ('connecting', 'pending', 'saving', 'disconnecting', 'cataloguing', 'downloading'):
                     raise ValueError('Wait for the current camera action to finish before closing.')
                 self.state.update(phase='pending', message='Saving and disconnecting before closing…')
                 self.commands.put('close')
@@ -94,12 +121,39 @@ class Monitor:
                 self.commands = queue.Queue()
                 self.jpeg = None
                 self.jpeg_time = 0
+                self.library_records = {}
+                self.gallery.update(status='empty', items=[], complete=False, warning=None,
+                                    revision=self.gallery['revision'] + 1, pages=0, loadedAt=None)
                 self.state.update(phase="connecting", message="Looking for your Nano…", error=None, frames=0)
                 self.worker = threading.Thread(target=lambda: asyncio.run(self.session()), daemon=True)
                 self.worker.start()
                 return
             if phase not in ("live", "recording", "preview_unavailable"):
                 raise ValueError("Wait until the camera is connected and ready.")
+            if action in ('gallery_refresh', 'download'):
+                if self.state['recording']:
+                    raise ValueError('Stop the recording before browsing or downloading camera videos.')
+                if action == 'download':
+                    if not isinstance(body, dict) or set(body) - {'ids', 'label'}:
+                        raise ValueError('Send only video selection IDs and an optional batch label.')
+                    ids = (body or {}).get('ids')
+                    label = (body or {}).get('label', 'Camera download')
+                    if not isinstance(ids, list) or not 1 <= len(ids) <= 10000 or any(not isinstance(value, str) or value not in self.library_records for value in ids):
+                        raise ValueError('Choose videos from the current camera library. Refresh if it changed.')
+                    if not isinstance(label, str) or len(label) > 80:
+                        raise ValueError('The batch label is too long.')
+                    records = [self.library_records[value] for value in dict.fromkeys(ids)]
+                    storage.check()  # Destination is pinned again immediately before copying.
+                    payload = (action, records, label)
+                else:
+                    self.gallery.update(status='loading', warning=None)
+                    payload = (action,)
+                self.cancel_transfer.clear()
+                self.state.update(phase='cataloguing' if action == 'gallery_refresh' else 'downloading',
+                                  message='Loading the camera library…' if action == 'gallery_refresh' else 'Preparing your selected videos…',
+                                  error=None, progress=None, transfer=None)
+                self.commands.put(payload)
+                return
             if action == "start" and self.state["recording"]:
                 raise ValueError("The camera is already recording.")
             if action == "start":
@@ -110,6 +164,106 @@ class Monitor:
                 raise ValueError("Stop recording before disconnecting.")
             self.state.update(phase="pending", message={"start": "Starting recording…", "stop": "Stopping and saving…", "disconnect": "Disconnecting…"}[action])
             self.commands.put(action)
+
+    def copy_records(self, records, credentials, label, cancellable=False):
+        """Share original-file transfer with Stop and selected gallery downloads."""
+        db, http, manifest_path, manifest = None, None, None, None
+        completed = []
+        try:
+            destination = storage.check()
+            records = chronological(records)
+            destinations = set()
+            for record in records:
+                target = safe_destination(record, destination)
+                key = str(target).casefold()
+                if key in destinations:
+                    raise GalleryError('Two selected camera files have the same destination name. Download one at a time to separate folders.')
+                destinations.add(key)
+            db = HistoryDB(config.CONFIG_DIR / 'nano-transfer-history.sqlite3')
+            http = CameraHttp('192.168.2.1')
+            guard_downloads(http, destination)
+            off = Offloader(OffloadConfig(base_dir=destination, camera_folder='Nano', kinds=('video',)), db, http)
+            off.on_network_lost = lambda: wifi.rejoin_sync(credentials.ssid)
+            plan = off.plan(records)
+            conflicts = []
+            for item in plan:
+                if item.dest.exists() and item.skipped != 'already on disk':
+                    item.skipped = 'existing file has a different or unknown size'
+                    conflicts.append(item.record.name)
+            pending = [item.size for item in plan if not item.skipped]
+            if storage.check(pending, fresh=False) != destination:
+                raise GalleryError('The automatic save location changed while preparing. Retry the download.')
+            manifest_path, manifest = make_batch(records, destination, label)
+            rows = {row['id']: row for row in manifest['files']}
+            for item in plan:
+                if item.skipped:
+                    row = rows[record_id(item.record)]
+                    row.update(status='already_present' if item.skipped == 'already on disk' else 'failed',
+                               note=item.skipped, verification='size only' if item.skipped == 'already on disk' else None)
+            write_json(manifest_path, manifest)
+            journalled = set()
+            def progress(value):
+                completed[:] = value.results
+                for copied in completed:
+                    if copied['dest_path'] not in journalled:
+                        row = next(row for row in manifest['files'] if row['dest_path'] == copied['dest_path'])
+                        row.update(status='downloaded', hash=copied['hash'], verification='HTTP length and locally computed receive hash')
+                        write_json(manifest_path, manifest)
+                        journalled.add(copied['dest_path'])
+                current_bytes = 0 if completed and completed[-1]['original'] == value.current_name else value.current_done
+                self.update(progress=min(100, round(100 * (value.done_bytes + current_bytes) / max(value.total_bytes, 1))),
+                            transfer={'totalFiles': value.total_files, 'doneFiles': value.done_files,
+                                      'selectedCount': len(records), 'currentName': value.current_name,
+                                      'bytesDone': value.done_bytes + current_bytes,
+                                      'totalBytes': value.total_bytes, 'batchPath': str(manifest_path)})
+            result = off.run(plan, progress, cancelled=self.cancel_transfer.is_set if cancellable else None)
+            completed[:] = result.results
+            for copied in completed:
+                row = next(row for row in manifest['files'] if row['name'] == copied['original'])
+                row.update(status='downloaded', dest_path=copied['dest_path'], hash=copied['hash'], verification='HTTP length and locally computed receive hash')
+            for row in manifest['files']:
+                if row['status'] == 'queued':
+                    row['status'] = 'cancelled' if cancellable and self.cancel_transfer.is_set() else 'failed'
+            unusable = [row for row in manifest['files'] if row['status'] in ('failed', 'cancelled')]
+            manifest['status'] = 'cancelled' if cancellable and self.cancel_transfer.is_set() else 'partial' if unusable else 'complete'
+            manifest['failures'] = result.failures + [f'{name}: existing file was kept; move it aside to retry.' for name in conflicts]
+            return manifest
+        except Exception as error:
+            if manifest:
+                manifest.update(status='partial', failures=[str(error)])
+                by_name = {item['original']: item for item in completed}
+                for row in manifest['files']:
+                    if row['name'] in by_name:
+                        copied = by_name[row['name']]
+                        row.update(status='downloaded', dest_path=copied['dest_path'], hash=copied['hash'])
+                    elif row['status'] == 'queued':
+                        row.update(status='failed', note='Not completed: ' + str(error))
+            raise
+        finally:
+            # Close transfer resources even if the selected drive disappeared
+            # or persisting the local batch index fails.
+            if db:
+                db.close()
+            if http:
+                http.close()
+            with self.lock:
+                combined = list(reversed(completed)) + self.state['saved']
+                self.state['saved'] = list({item['dest_path']: item for item in reversed(combined)}.values())[::-1]
+                write_json(WORKSPACE / '.research' / 'nano-monitor-saved.json', self.state['saved'])
+                if manifest:
+                    try:
+                        for row in manifest['files']:
+                            if row['status'] in ('downloaded', 'already_present'):
+                                metadata = probe(Path(row['dest_path']))
+                                row.update(durationSeconds=metadata.duration_s, width=metadata.width, height=metadata.height)
+                        write_json(manifest_path, manifest)
+                    except (OSError, ValueError):
+                        manifest['status'] = 'partial'
+                    batch = {'path': str(manifest_path), 'label': label, 'status': manifest['status'],
+                             'count': sum(row['status'] in ('downloaded', 'already_present') for row in manifest['files']),
+                             'selectedCount': len(records), 'createdAt': manifest['createdAt']}
+                    self.state['batches'] = ([batch] + self.state['batches'])[:20]
+                    write_json(WORKSPACE / '.research' / 'nano-monitor-batches.json', self.state['batches'])
 
     def start_decoder(self):
         executable = shutil.which("ffmpeg")
@@ -216,9 +370,10 @@ class Monitor:
                     last_preview_repair = now
                     self.update(message="Waiting for a live picture; reconnect if it stays blank.")
                 try:
-                    action = self.commands.get_nowait()
+                    command = self.commands.get_nowait()
                 except queue.Empty:
                     continue
+                action = command[0] if isinstance(command, tuple) else command
                 if action == "disconnect" or (action == 'close' and not dl.status.recording):
                     break
                 if action == "start":
@@ -228,6 +383,55 @@ class Monitor:
                     self.wait_recording(dl, True)
                     app_recording = True
                     self.update(phase="recording", recording=True, message="Recording on the Nano. Stop to save the original here.")
+                elif action == 'gallery_refresh':
+                    if dl.status.recording:
+                        self.update(phase='recording', message='Stop recording before loading the library.', error='The Nano is recording.')
+                        self.gallery.update(status='empty')
+                        continue
+                    dl.enter_playback()
+                    def fetch_page(cursors):
+                        nonlocal dl
+                        try:
+                            return query_page(dl, cursors, self.cancel_transfer.is_set)
+                        except GalleryError:
+                            if self.cancel_transfer.is_set():
+                                raise
+                            # Camera sessions can stop answering after several pages.
+                            dl.close()
+                            dl = CameraDatalink('192.168.2.1', identifier=identifier)
+                            dl.tx = LiveTransport(self.on_video)
+                            if not dl.open():
+                                raise GalleryError('Could not reconnect for older library pages.')
+                            dl.register()
+                            dl.enter_playback()
+                            return query_page(dl, cursors, self.cancel_transfer.is_set)
+                    def publish(records, pages):
+                        self.publish_gallery(records, pages, status='loading')
+                        self.update(message=f'Loading library: {sum(r.is_video for r in records)} videos, {pages} pages…')
+                    records, complete, warning = walk_library(fetch_page, publish, self.cancel_transfer.is_set)
+                    self.publish_gallery(records, self.gallery['pages'], status='ready', complete=complete,
+                                         warning=warning, loadedAt=time.time())
+                    known.update(record.media_path for record in records)
+                    self.enable_preview(dl)
+                    self.update(phase='live', message='Camera library loaded.' if complete else warning,
+                                progress=None, error=None)
+                elif action == 'download':
+                    if dl.status.recording:
+                        self.update(phase='recording', message='Stop recording before downloading files.', error='The Nano is recording.')
+                        continue
+                    dl.enter_playback()
+                    try:
+                        batch = self.copy_records(command[1], credentials, command[2], cancellable=True)
+                        failed = batch['status'] == 'partial'
+                        self.update(message='Download cancelled. Completed originals are kept.' if batch['status'] == 'cancelled' else
+                                    'Some selected files were not copied. Check the batch details and retry.' if failed else
+                                    'Selected originals saved. Your chronological editing batch is ready.',
+                                    error='Some files were not copied; originals remain on the camera.' if failed else None)
+                    except (ValueError, OSError) as error:
+                        self.update(message=str(error), error=str(error))
+                    self.publish_gallery(list(self.library_records.values()), self.gallery['pages'])
+                    self.enable_preview(dl)
+                    self.update(phase='live', progress=None, transfer=None)
                 elif action in ("stop", "close"):
                     reply = dl.run_command(2, 2, b"\x00")
                     if reply != b"\x00":
@@ -241,29 +445,13 @@ class Monitor:
                     new = [record for record in records if record.is_video and record.media_path not in known]
                     if not new:
                         raise RuntimeError("Recording stopped, but the new file was not listed. It remains on the camera; use Download New Videos to retry.")
-                    db = HistoryDB(config.CONFIG_DIR / "nano-transfer-history.sqlite3")
-                    destination = storage.check([record.size for record in new])
-                    http = CameraHttp("192.168.2.1")
-                    guard_downloads(http, destination)
-                    off = Offloader(OffloadConfig(base_dir=destination, camera_folder="Nano", kinds=("video",)), db, http)
-                    off.on_network_lost = lambda: wifi.rejoin_sync(credentials.ssid)
-                    plan = off.plan(new)
-                    for item in plan:
-                        if item.dest.exists():
-                            item.skipped = "destination already exists"
-                    def progress(value):
-                        self.update(progress=round(100 * (value.done_bytes + value.current_done) / max(value.total_bytes, 1)))
-                    result = off.run(plan, progress)
-                    if result.failures:
-                        raise RuntimeError("Some recordings could not be copied. They remain on the camera; retry the transfer launcher.")
-                    with self.lock:
-                        self.state["saved"] = list(reversed(result.results)) + self.state["saved"]
-                        (WORKSPACE / ".research" / "nano-monitor-saved.json").write_text(json.dumps(self.state["saved"], indent=2), encoding="utf-8")
+                    result = self.copy_records(new, credentials, 'Finished recording')
+                    if result['status'] != 'complete':
+                        raise RuntimeError('Some recordings could not be copied. They remain on the camera; select them in Download videos to retry.')
                     known.update(record.media_path for record in records)
-                    db.close(); db = None
-                    http.close(); http = None
                     self.enable_preview(dl)
-                    self.update(phase="live", message="Original saved to your selected location. Ready for another take.", progress=None)
+                    self.gallery.update(status='stale')
+                    self.update(phase="live", message="Original saved to your selected location. Ready for another take.", progress=None, transfer=None)
                     if action == 'close':
                         break
         finally:
@@ -330,6 +518,9 @@ monitor = Monitor()
 saved_path = WORKSPACE / ".research" / "nano-monitor-saved.json"
 if saved_path.exists():
     monitor.state["saved"] = json.loads(saved_path.read_text(encoding="utf-8"))
+batches_path = WORKSPACE / '.research' / 'nano-monitor-batches.json'
+if batches_path.exists():
+    monitor.state['batches'] = json.loads(batches_path.read_text(encoding='utf-8'))
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -361,6 +552,8 @@ class Handler(BaseHTTPRequestHandler):
                 self.reply(monitor.snapshot())
             except ValueError as error:
                 self.reply({'error': str(error)}, 409)
+        elif route == '/gallery':
+            self.reply(monitor.gallery_snapshot())
         elif route == "/preview":
             self.send_response(200)
             self.send_header("Content-Type", "multipart/x-mixed-replace; boundary=nano")
@@ -388,18 +581,25 @@ class Handler(BaseHTTPRequestHandler):
             self.reply({"error": "Unauthorized local bridge request."}, 403)
             return
         action = self.path.lstrip("/")
-        if action not in ("connect", "start", "stop", "disconnect", "folder", "storage", "close"):
+        if action not in ("connect", "start", "stop", "disconnect", "folder", "storage", "close", 'gallery_refresh', 'download', 'cancel'):
             self.reply({"error": "Unknown action"}, 404)
             return
         try:
             length = int(self.headers.get('Content-Length', '0'))
-            if length < 0 or length > 4096:
+            if length < 0 or length > (512000 if action == 'download' else 4096):
                 raise ValueError('Request is too large.')
             body = json.loads(self.rfile.read(length)) if length else {}
             if not isinstance(body, dict):
                 raise ValueError('Expected a JSON object.')
             if action == "folder":
-                if 'savedPath' in body:
+                if 'batchPath' in body:
+                    match = next((item for item in monitor.snapshot()['batches'] if item['path'] == body['batchPath']), None)
+                    if not match:
+                        raise ValueError('That batch is not in the saved list.')
+                    destination = Path(match['path']).parent
+                    if not destination.is_dir():
+                        raise ValueError('This batch folder is unavailable. Reconnect its drive.')
+                elif 'savedPath' in body:
                     match = next((item for item in monitor.snapshot()['saved'] if item['dest_path'] == body['savedPath']), None)
                     if not match:
                         raise ValueError('That recording is not in the saved list.')
@@ -412,7 +612,7 @@ class Handler(BaseHTTPRequestHandler):
             elif action == "storage":
                 monitor.choose_storage(body.get('id'))
             else:
-                monitor.action(action)
+                monitor.action(action, body)
             self.reply(monitor.snapshot(), 202)
         except (ValueError, OSError) as error:
             self.reply({"error": str(error)}, 409)

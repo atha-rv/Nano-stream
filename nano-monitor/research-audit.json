@@ -18,12 +18,11 @@
       "title": "braces vulnerable to stack-exhaustion denial of service through deeply nested patterns",
       "module_name": "braces",
       "vulnerable_versions": "<=3.0.3",
-      "patched_versions": null,
+      "patched_versions": ">=3.0.4",
       "severity": "high",
       "cwe": "CWE-674",
       "github_advisory_id": "GHSA-vfj7-8cjw-p6xm",
-      "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
-      "patched_versions_unpublished": true
+      "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm"
     }
   },
   "metadata": {

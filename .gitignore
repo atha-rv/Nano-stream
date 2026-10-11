@@ -37,6 +37,10 @@ footage/
 recordings/
 transcripts/
 editing-projects/
+personal-foundations/
+approved-assets/
+my-editing-foundation*.html
+batch.json
 models/
 .media/
 

@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { NextRequest, NextResponse } from 'next/server';
 
-const actions = new Set(['state', 'preview', 'connect', 'start', 'stop', 'disconnect', 'folder', 'storage']);
+const actions = new Set(['state', 'preview', 'connect', 'start', 'stop', 'disconnect', 'folder', 'storage', 'gallery', 'gallery_refresh', 'download', 'cancel']);
 
 async function proxy(request: NextRequest, context: {params: Promise<{action: string}>}) {
   const {action} = await context.params;
@@ -16,10 +16,10 @@ async function proxy(request: NextRequest, context: {params: Promise<{action: st
   if (request.method === 'POST' && origin && origin !== `http://${host}`) {
     return NextResponse.json({error: 'Untrusted request origin.'}, {status: 403});
   }
-  const mutation = ['connect', 'start', 'stop', 'disconnect', 'folder'].includes(action);
+  const mutation = ['connect', 'start', 'stop', 'disconnect', 'folder', 'gallery_refresh', 'download', 'cancel'].includes(action);
   if (action !== 'storage' && (request.method === 'POST') !== mutation) return NextResponse.json({error: 'Method not allowed'}, {status: 405});
   const body = request.method === 'POST' ? await request.text() : undefined;
-  if (body && body.length > 4096) return NextResponse.json({error: 'Request is too large'}, {status: 413});
+  if (body && Buffer.byteLength(body) > (action === 'download' ? 512000 : 4096)) return NextResponse.json({error: 'Request is too large'}, {status: 413});
   try {
     const file = process.env.NANO_BRIDGE_SESSION || resolve(process.cwd(), '../../../.research/nano-bridge-session.json');
     const session = JSON.parse(await readFile(file, 'utf8')) as {port: number; token: string};

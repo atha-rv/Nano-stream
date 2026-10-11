@@ -16,8 +16,8 @@ jobs:
         with:
           python-version: '3.13'
       - run: python -m pip install pytest==9.1.1
-      - run: python -m pytest tools/nano-transfer/test_storage.py -q
-      - run: node --test nano-monitor/desktop/bridge.test.cjs
+      - run: python -m pytest tools/nano-transfer/test_storage.py nano-monitor/camera/test_gallery.py nano-monitor/camera/test_server.py tools/nano-transfer/test_prepare_dump.py -q
+      - run: node --test nano-monitor/desktop/bridge.test.cjs nano-monitor/apps/web/app/monitor/gallery-model.test.mjs nano-monitor/design/foundation.test.cjs
       - run: python -m compileall -q nano-monitor/camera tools/nano-transfer
       - name: Parse desktop setup scripts
         shell: pwsh

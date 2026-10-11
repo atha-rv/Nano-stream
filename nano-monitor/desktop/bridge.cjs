@@ -4,8 +4,8 @@ const {spawn} = require('node:child_process');
 const net = require('node:net');
 const path = require('node:path');
 
-const reads = new Set(['state', 'storage']);
-const writes = new Set(['connect', 'start', 'stop', 'disconnect', 'folder', 'storage']);
+const reads = new Set(['state', 'storage', 'gallery']);
+const writes = new Set(['connect', 'start', 'stop', 'disconnect', 'folder', 'storage', 'gallery_refresh', 'download', 'cancel']);
 
 function validateRequest(action, method, body) {
   if (!(method === 'GET' ? reads : method === 'POST' ? writes : new Set()).has(action)) {
@@ -13,12 +13,22 @@ function validateRequest(action, method, body) {
   }
   if (body !== undefined) {
     if (!body || typeof body !== 'object' || Array.isArray(body)) throw new Error('Invalid action data.');
-    const key = action === 'storage' ? 'id' : action === 'folder' ? 'savedPath' : null;
+    if (action === 'download') {
+      if (!Array.isArray(body.ids) || !body.ids.length || body.ids.length > 10000 ||
+          body.ids.some(id => typeof id !== 'string' || !/^[a-f0-9]{24}$/.test(id)) ||
+          Object.keys(body).some(key => !['ids','label'].includes(key)) ||
+          (body.label !== undefined && (typeof body.label !== 'string' || body.label.length > 80))) {
+        throw new Error('Choose videos from the camera library.');
+      }
+      return;
+    }
+    const key = action === 'storage' ? 'id' : action === 'folder' ? (body.batchPath ? 'batchPath' : 'savedPath') : null;
     if (!key || Object.keys(body).length !== 1 || typeof body[key] !== 'string' || body[key].length > 2048) {
       throw new Error('Invalid action data.');
     }
   }
   if (action === 'storage' && method === 'POST' && !body) throw new Error('Choose a storage preference.');
+  if (action === 'download' && !body) throw new Error('Choose videos from the camera library.');
 }
 
 class Bridge {

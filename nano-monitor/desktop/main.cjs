@@ -22,6 +22,14 @@ async function closeSafely() {
   closing = true;
   try {
     let reply = await bridge.request('state');
+    if (['cataloguing', 'downloading'].includes(reply.data.phase)) {
+      const choice = await dialog.showMessageBox(window, {type: 'question', title: 'Camera download in progress',
+        message: 'Cancel the current library task and close?',
+        detail: 'Completed files and camera originals are kept. A partial file can be resumed later.',
+        buttons: ['Cancel task & close', 'Keep app open'], defaultId: 1, cancelId: 1});
+      if (choice.response !== 0) return;
+      await bridge.request('cancel', 'POST');
+    }
     if (reply.data.recording) {
       const choice = await dialog.showMessageBox(window, {type: 'question', title: 'Recording on Nano',
         message: 'Stop this recording, save the original, then close?',

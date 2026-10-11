@@ -2,14 +2,15 @@
 
 import {useEffect, useRef, useState} from 'react';
 import {Button} from '@kit/ui/button';
-import {Camera, FolderOpen, Maximize, Radio, Square, Video, Wifi, CheckCircle2} from 'lucide-react';
+import {Camera, Download, FolderOpen, Maximize, Radio, Square, Video, Wifi, CheckCircle2} from 'lucide-react';
 import './monitor.css';
 import {cameraRequest, previewUrl} from './camera-client';
+import {CameraGallery, DownloadBatch} from './camera-gallery';
 
 type Saved = {original: string; size: number; dest_path: string};
 type Volume = {id: string; root: string; label: string; filesystem: string; free: number};
 type Storage = {selectedId: string; available: boolean; error: string | null; free: number | null; external: boolean; automatic: boolean; filesystem: string | null; volumes: Volume[]};
-type State = {phase: string; message: string; recording: boolean; battery: number | null; saved: Saved[]; error: string | null; destination: string; progress: number | null; frames: number; previewAge: number | null; storage?: Storage};
+type State = {phase: string; message: string; recording: boolean; battery: number | null; saved: Saved[]; error: string | null; destination: string; progress: number | null; frames: number; previewAge: number | null; storage?: Storage; batches?: DownloadBatch[]; transfer?: {totalFiles:number;doneFiles:number;selectedCount:number;currentName:string;bytesDone:number;totalBytes:number}};
 const initial: State = {phase: 'loading', message: 'Checking the local camera bridge…', recording: false, battery: null, saved: [], error: null, destination: '', progress: null, frames: 0, previewAge: null};
 const formatSize = (bytes: number) => bytes >= 1e9 ? `${(bytes/1e9).toFixed(2)} GB` : `${(bytes/1e6).toFixed(1)} MB`;
 
@@ -20,11 +21,12 @@ export default function MonitorPage() {
   const [generation, setGeneration] = useState(0);
   const [location, setLocation] = useState<string | null>(null);
   const [storageBusy, setStorageBusy] = useState(false);
+  const [galleryOpen,setGalleryOpen]=useState(false);
   const panel = useRef<HTMLElement>(null);
-  const connected = ['live','recording','pending','saving','preview_unavailable'].includes(state.phase);
+  const connected = ['live','recording','pending','saving','preview_unavailable','cataloguing','downloading'].includes(state.phase);
   const ready = ['live','recording','preview_unavailable'].includes(state.phase);
   const idle = ['disconnected','error','offline'].includes(state.phase);
-  const stale = connected && state.phase !== 'saving' && state.previewAge !== null && state.previewAge > 3;
+  const stale = connected && !['saving','cataloguing','downloading'].includes(state.phase) && state.previewAge !== null && state.previewAge > 3;
 
   useEffect(() => {
     let stopped = false;
@@ -82,6 +84,7 @@ export default function MonitorPage() {
     <header className="nm-header">
       <div className="nm-brand"><span className="nm-mark"><Camera size={21}/></span><div><h1>Nano Monitor</h1><p>Your camera. A bigger view.</p></div></div>
       <div className="nm-header-actions"><span className="nm-local"><Wifi size={14}/>On this PC</span>
+        <Button variant="outline" onClick={()=>setGalleryOpen(true)} disabled={state.phase==='offline'||state.phase==='loading'}><Download size={16}/>Download videos</Button>
         {idle && <Button className="nm-connect" disabled={!!busy || state.phase === 'offline'} onClick={() => action('connect')}><Radio size={16}/>Connect Nano</Button>}
         {connected && <Button variant="outline" disabled={!!busy || state.recording || !ready} onClick={() => action('disconnect')}>Disconnect</Button>}
         {['connecting','disconnecting','loading'].includes(state.phase) && <span className="nm-working">{state.phase === 'connecting' ? 'Connecting…' : state.phase === 'disconnecting' ? 'Disconnecting…' : 'Starting…'}</span>}
@@ -138,6 +141,7 @@ export default function MonitorPage() {
     <section className="nm-saved" aria-labelledby="saved-heading"><div className="nm-saved-heading"><div><span className="nm-section-label">YOUR SAVED FILES</span><h2 id="saved-heading">Saved recordings</h2></div><span>{state.saved.length} saved</span></div>
       {state.saved.length ? <ul>{state.saved.slice(0,20).map((video, index) => <li key={`${video.dest_path}-${index}`}><span className="nm-file-icon"><CheckCircle2 size={18}/></span><div><p>{video.original}</p><span>Original camera file · {formatSize(video.size)}</span><span>{video.dest_path}</span></div><Button variant="ghost" onClick={() => action('folder', {savedPath: video.dest_path})} disabled={!!busy || state.phase === 'offline'} aria-label={`Open folder containing ${video.original}`}><FolderOpen size={18}/><span>Show folder</span></Button></li>)}</ul> : <div className="nm-empty"><FolderOpen size={22}/><p>Your next finished take will appear here after it’s copied.</p></div>}
     </section>
-    <footer className="nm-footer">Live view is for framing. The saved original keeps your camera’s recording resolution and audio.</footer>
+    <CameraGallery open={galleryOpen} onClose={()=>setGalleryOpen(false)} phase={state.phase} recording={state.recording} destination={state.destination} storageAvailable={state.storage?.available!==false} error={error||state.error} progress={state.progress} transfer={state.transfer} batches={state.batches} action={action}/>
+    <footer className="nm-footer">Live view is for framing. The saved original keeps your camera’s recording resolution and audio. Use Download videos to browse and copy older recordings.</footer>
   </main>;
 }

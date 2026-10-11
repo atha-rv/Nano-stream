@@ -7,6 +7,64 @@ or social uploads. One landscape edit was completed outside this repository.
 
 ## Intended experience
 
+The default brief for every video/dump given to Codex is a YouTube landscape
+edit **plus usable vertical Instagram Reels from the same originals**. White
+Helvetica-style text (Arial/sans-serif fallback), natural voice/colour and
+restrained graphics are approved. Neon pink **#FF2DAA** is optional for a playful
+moment. Avoid software dashboards, monospace headings and flashy decoration.
+The earlier green workflow graphic felt too techy; that is feedback for future
+edits, not a request to rerender the completed cut.
+
+### Approved foundation HTML
+
+Open `nano-monitor/design/editing-foundation.html` in a browser. Preview white or
+pink type over a local video/image, with landscape/portrait toggles. Add images,
+licensed fonts or sounds, approve assets and write reuse notes. New files start
+**pending**. Save a personal HTML copy on USB/D: and give it to the editor. Assets,
+approvals and notes are embedded in that copy; preview footage is session-only.
+Save after each change and reopen the copy to confirm. Browsers without File
+System Access download an HTML instead; choose USB/D: as its destination. The
+public template has no personal assets, makes no network requests and includes
+no Helvetica font files. Keep personal copies outside Git.
+
+### Prepare a camera dump
+
+Open **Download videos**, choose a filter and adjust checkboxes. After downloading,
+**Open batch folder** shows the chronological `batch.json` and editing brief.
+It includes completed originals and valid existing local files; failed/cancelled
+files remain explicit. Dates use the camera filename clock, with no inferred
+timezone. Files are stored by recording date, not download time.
+
+For local word-timed transcripts, use a **separate editing Python environment**
+with the reviewed `faster-whisper` installed:
+
+```powershell
+# Replace python with your editing environment's interpreter.
+python tools/nano-transfer/prepare_dump.py --batch 'E:\Osmo Nano\Nano\batches\YOUR-BATCH\batch.json' --transcribe --model small.en
+```
+
+Omit `--transcribe` to build an inventory/brief without a speech model. Use
+`--model small` for multilingual speech or give an existing local model directory.
+New model/temp/media caches stay in the batch's `edit` folder on the footage
+drive; the CLI refuses batches on C:. Word-timed JSON transcripts are stored
+beside originals under `video/edit/transcripts`, so future dumps reuse them while
+source size/mtime and model match. Damaged caches are regenerated. One failed
+transcription preserves successful ones; exit status 2 and the intake identify
+failures. Review uncertain recognised words and source visuals before cuts.
+
+The helper transcribed two short real USB downloads with the existing local
+small.en model; both originals fully decoded. This verifies the preparation
+path, not long/noisy/multilingual speech quality. Unit tests use a model adapter
+for cache invalidation and timing storage. The app has no integrated AI story
+selector, renderer, face tracking or platform uploader yet.
+
+Give Codex `batch.json`, your saved foundation and any intended subject/audience.
+The editor reads usable clips/transcripts, chooses the emerging story and
+self-contained Reel moments, then previews cuts/framing/captions before exports.
+Chronology alone is not a story. Keep projects/renders beside their sources.
+
+### Editing pass
+
 1. Record with the Nano while checking framing on the laptop. A future optional
    9:16 guide would show the area a vertical crop can retain, alongside a simple
    composition grid. Keep the subject inside that area when one recording needs

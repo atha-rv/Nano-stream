@@ -16,7 +16,11 @@
     "date": "2026-10-11",
     "selected": "Automatic preference: connected external USB, otherwise D:\\Osmo Nano. E: currently available with approximately 41.26 GB free; explicit D:/USB overrides retained.",
     "research": "Reuse existing pinned MIT OsmoOffload planner/downloader, Python stdlib and Windows Storage/volume APIs. Get-Disk identifies USB SSDs as well as removable pen drives. Microsoft GetVolumeNameForVolumeMountPointW checks identity while streaming. No new dependency or formatting operation.",
-    "sources": ["https://learn.microsoft.com/en-us/powershell/module/storage/get-disk", "https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getvolumenameforvolumemountpointw", "https://learn.microsoft.com/en-us/windows/win32/fileio/filesystem-functionality-comparison"],
+    "sources": [
+      "https://learn.microsoft.com/en-us/powershell/module/storage/get-disk",
+      "https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getvolumenameforvolumemountpointw",
+      "https://learn.microsoft.com/en-us/windows/win32/fileio/filesystem-functionality-comparison"
+    ],
     "functional": "Nine storage tests pass, including automatic external-to-D fallback and return, explicit overrides, changed letters, replaced/unplugged drive, FAT32 limits, free space, unreadable settings/read-only rollback, legacy preference migration and keeping an active transfer pinned to its original volume. Real D: write access checked with USB inventory intentionally empty. Real USB HTTP fixture wrote/read 524,288 bytes, checked content/hash and partial finalization. Editing child confirmed cwd, TEMP/TMP, media and frame-cache paths on E:. Fixtures cleaned. TypeScript passed; Python compiled.",
     "separate_critique": "Source review after functional checks: explicit select label, 44px select/buttons, constrained width and wrapping paths, separate Apply/Refresh, missing-volume error, change disabled during camera session, Stop remains available if drive goes missing. Each saved file opens its own stored folder. Browser inspection could not run because reload of the retained tab was rejected by the browser URL policy; no workaround was attempted. New controls' rendered phone/desktop appearance remains unverified.",
     "limits": "Camera-to-USB hardware recording/copy, physical USB removal and full edit render on USB have not been exercised. Existing internal originals and old edit caches were not moved or removed. Editing caches redirect only for commands using edit_on_drive.py or its printed environment settings. Installed application/runtime files remain internal."
@@ -37,5 +41,17 @@
     "Long recording/preview soak and Wi-Fi drop recovery not hardware-verified",
     "One unpatched braces advisory in build/component tooling",
     "Developer evidence and one user success do not establish general usability"
-  ]
+  ],
+  "gallery_update": {
+    "limits": "Large libraries beyond two pages, other firmware, physical drive removal, new full Record/Stop hardware cycle after shared-path refactor, clean second-PC install, WebKit/Firefox, enlarged text and native close during copy are unverified.",
+    "functional": "20 Python tests passed: storage, pagination, selection validation, completed-file journals and resource cleanup after simulated interruption, transcript cache/timing invalidation. Six Node tests passed for IPC, filters and safe embedded foundation JSON. TypeScript passed and desktop rebuilt. Fresh desktop audit: zero known advisories; retained web/build audit: one previously documented high braces advisory.",
+    "desktop": "Compiled renderer gallery exercised through temporary loopback QA harness with simulated library: quick filters, manual deselection, clear selection and Esc focus return. Native Electron smoke cold-start passed with isolated renderer and automatic E: storage. Native narrow smoke: actual 322 CSS px, scrollWidth 322, Download videos control visible and over 44px.",
+    "date": "2026-10-11",
+    "phone": "Gallery inspected at actual 383 CSS px, no horizontal overflow, every visible button 44px. Foundation inspected at actual 339 CSS px with no horizontal overflow. Browser viewport is emulation, not physical phone/native camera use.",
+    "scope": "Paginated video selection, bulk filters, original download batches, separate transcript intake and reusable approved style HTML",
+    "states": "Real camera complete batch. Simulated selectable/conflict/already-present items and zero-selection disabled download. Date filter logic tested; native date widget interaction, physical removal and native close during download need further verification.",
+    "foundation": "Local PNG import starts pending; approval/notes edited in browser; save success feedback observed. Serializer round-trips script-like text/asset approval data safely. Saved-copy reload, fallback browser downloads and supplied-font rendering not fully verified. Public template remains empty.",
+    "hardware": "One Nano returned 48 videos across two pages and reported complete. Two selected 4K originals copied to E:; chronological complete batch produced, FFmpeg fully decoded both and normal Wi-Fi restored. Local small.en transcribed both into source-adjacent word-timed JSON and batch story-intake on E:.",
+    "critique": "Separate screenshot review after selection checks: wrapped filenames, clear selection counts and destination, fixed download footer, filter rows wrap on phone. Removed duplicate body scrollbar while modal is open. Future video styling is restrained white/pink, independent of the camera app identity."
+  }
 }
