@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "established_on": "2026-10-02",
+  "scope": "Responsive web applications with the agreed feature set preserved",
+  "intent": "Take responsibility for the complete experience, choose the interaction model for each product, and resolve defects before asking the user to spot them.",
+  "status": "Reusable design and review specification; no application has been implemented or certified by this document",
+  "invariants": [
+    "Preserve the requested capabilities and outcomes. Reorganizing controls does not authorize silently deleting features or adding new ones.",
+    "Reuse infrastructure, accessible primitives, and behavior patterns. Choose navigation, density, and layout for the actual task.",
+    "Use the smallest sufficient workflow. Optimize comprehension, decisions, recovery, and completion, rather than counting clicks alone.",
+    "Apply judgment proactively within the authorized scope. Ask only when an unresolved choice materially changes the user's intended outcome.",
+    "Treat visual polish, copy, interaction, data integrity, accessibility, and performance as parts of the same experience."
+  ],
+  "design_process": [
+    {
+      "step": "Define the product promise",
+      "deliverable": "A short internal brief naming the user, situation, intended outcome, existing capabilities, constraints, and the journeys that determine whether this particular app succeeds.",
+      "checks": ["Describe the outcome without listing screens.", "Define what a first-time user needs to understand and what a returning user needs to resume.", "Record the boundaries of the agreed scope."]
+    },
+    {
+      "step": "Research solutions and choose the interaction model",
+      "deliverable": "Evaluate relevant products and licensed open-source implementations; compare plausible structures when there is a meaningful design choice, then record the reason for choosing one.",
+      "checks": ["Organize around the user's objects and vocabulary rather than database tables or starter navigation.", "Use a workspace when simultaneous context helps, an overview when comparison is the job, and a focused flow when a sequence matters.", "Check the structure on phone as well as desktop before polishing it."]
+    },
+    {
+      "step": "Build a complete representative journey",
+      "deliverable": "Working behavior with realistic content, persistence, useful feedback, and relevant failure recovery before expanding the same pattern across the app.",
+      "checks": ["Give common actions visible, understandable labels; icons and hover tooltips must not be the only way to discover an unfamiliar core action.", "Choose a clear main action for each task state without hiding equally important comparison or editing tools.", "Disclose advanced controls when useful, while keeping frequent actions easy to reach.", "Preserve input, focus, selection, and navigation context through transitions where applicable."]
+    },
+    {
+      "step": "Critique the whole product",
+      "deliverable": "Review the working app as a first-time user, a returning user, and a user recovering from a relevant failure. Fix the highest-impact problems within the current scope.",
+      "checks": ["Can the user predict what each action does and identify the next useful step?", "Which decisions, labels, repeated inputs, or competing controls can be simplified?", "Are required capabilities still discoverable after simplifying?", "Do realistic long, empty, and awkward content cases hold up?", "Does the phone workflow work with touch and the virtual keyboard?", "Does the successful result persist and remain accessible after refresh or return?"]
+    },
+    {
+      "step": "Present evidence and limits",
+      "deliverable": "A working preview and concise explanation of design choices, checked journeys, resolved issues, and any remaining uncertainty.",
+      "checks": ["Screenshots support visual inspection; they do not prove interaction, accessibility, or usability.", "Automated tests support particular behaviors; they do not prove that unfamiliar people understand the product.", "Record observed problems and actual results instead of awarding arbitrary quality scores.", "Do not imply production readiness for integrations that have only been mocked or inspected."]
+    }
+  ],
+  "reusable_experience_rules": {
+    "visual_craft": [
+      "Use semantic design tokens for type, spacing, color, surfaces, focus, and motion; choose the identity to fit the product.",
+      "Use typography, alignment, grouping, and contrast to establish hierarchy before adding decoration.",
+      "Choose density based on the task and content. Neither empty space nor maximal information is inherently better.",
+      "Keep wording consistent, concrete, and in the user's language. Explain errors with a useful recovery action.",
+      "Use motion for orientation and feedback when helpful, and respect reduced-motion preferences."
+    ],
+    "responsive_behavior": [
+      "Preserve capabilities across desktop and phone while adapting their presentation and controls.",
+      "Keep essential actions reachable with touch; no hover-only workflow.",
+      "Use a house target of at least 44 by 44 CSS pixels for primary touch controls. This is our stricter design target, not a statement that WCAG AA requires 44 pixels.",
+      "Check narrow and wide layouts, zoom, long labels, overflowing content, virtual keyboards, and browser back navigation where applicable.",
+      "On mobile, adapt dense tables, inspectors, and navigation to the task; do not merely clip or shrink the desktop screen."
+    ],
+    "trust_and_recovery": [
+      "Make saving, saved, pending, and failed states truthful. Keep recoverable input available after errors.",
+      "Use undo or reversible behavior where supported. Reserve disruptive confirmations for consequential mistakes.",
+      "Handle session expiry, network failures, and conflicting updates when the app's behavior makes them relevant.",
+      "Ask for personal data and device permissions in context, with a clear reason.",
+      "Use Dodo Payments with clear price, billing interval, renewal and cancellation behavior. Represent pending checkout honestly and grant access only from verified server state."
+    ],
+    "components": [
+      "Prefer the audited foundation's existing shadcn wrappers and Base UI primitives when they fit. Verify the actual installed versions and component behavior before adoption.",
+      "Research task-specific libraries before building editors, tables, uploads, media capture, charts, and similar substantial controls.",
+      "A component library supplies building blocks; product structure and complete journeys still require design.",
+      "Maintain coherent interaction conventions instead of accumulating overlapping primitive systems without a concrete need."
+    ]
+  },
+  "verification_baseline": {
+    "accessibility": "Target WCAG 2.2 AA. Check keyboard and focus, accessible names, forms and errors, text and UI contrast, text resizing and reflow, and screen-reader behavior for critical journeys. Combine automated checks with manual inspection; do not claim certification from an automated pass.",
+    "browsers": "Exercise critical desktop and phone journeys in Chromium and WebKit, plus Firefox when applicable. Distinguish emulation from physical-device testing.",
+    "states": "Select relevant loading, empty, populated, validation, permission, pending, success, and failure cases for each critical journey. Mark inapplicable cases explicitly rather than adding new features to satisfy a checklist.",
+    "performance": "Use good Core Web Vitals as the field target: LCP <= 2.5 seconds, INP <= 200 milliseconds, CLS <= 0.1 at the 75th percentile, assessed separately on mobile and desktop. Before field data exists, report lab and interaction measurements as such. Budget expensive components and media for the actual workflow.",
+    "scope_control": "Fix hierarchy, wording, navigation, transitions, responsive behavior, defects, and existing-feature reliability. Propose new capabilities separately instead of quietly expanding the project."
+  },
+  "mediaworks_evidence": {
+    "chat_title": "Find the screenplay tool chat",
+    "documents_read": [
+      "D:/MediaWorks/Projects/Gesture-Screenplay/shared/UI_RESEARCH.md",
+      "D:/MediaWorks/Projects/Gesture-Screenplay/shared/INTERACTION_REDESIGN.md"
+    ],
+    "transferable_lesson": "A visually tidy screen can still impose too many competing tasks. Determine the primary activity and when supporting context is useful.",
+    "context_specific_solution": "A document-led writing screen with library and direction controls opened when needed fit this screenplay workflow. It is not a universal app layout.",
+    "further_critique": "Simplification must preserve discoverability: faint or unfamiliar icon-only controls can make an essential feature difficult to find. Evaluate this with actual journeys.",
+    "limits": "Prior chat notes and saved screenshots were inspected. The running app was not re-tested, no new usability study was conducted, and MediaWorks was not changed."
+  },
+  "sources": [
+    {"url": "https://developer.apple.com/videos/play/wwdc2026/250/", "use": "Purpose, agency, responsibility, familiarity, flexibility, simplicity, craft; principles require contextual judgment, not a universal formula."},
+    {"url": "https://developer.apple.com/design/human-interface-guidelines/layout", "use": "Hierarchy, grouping, adaptation and layout."},
+    {"url": "https://developer.apple.com/design/human-interface-guidelines/disclosure-controls", "use": "Selective disclosure of supporting information."},
+    {"url": "https://base-ui.com/react/overview/accessibility", "use": "Accessible primitives; application-level verification still required."},
+    {"url": "https://www.w3.org/TR/WCAG22/", "use": "Web accessibility criteria."},
+    {"url": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html", "use": "AA minimum target criterion and exceptions; distinguish from our 44 CSS pixel house target."},
+    {"url": "https://web.dev/articles/vitals", "use": "Core Web Vitals thresholds and field measurement."},
+    {"url": "https://docs.dodopayments.com/developer-resources/webhooks", "use": "Verified payment events and truthful entitlement feedback."}
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "web-e2e",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "main": "index.js",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test:preview": "playwright test --config=playwright.preview.config.ts",
+    "report": "playwright show-report",
+    "test": "playwright test --max-failures=1",
+    "test:ui": "playwright test --ui"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.11.1",
+    "@playwright/test": "catalog:",
+    "@types/node": "catalog:",
+    "node-html-parser": "catalog:"
+  }
+}

@@ -1,0 +1,47 @@
+# Credentials, camera pairing state and isolated runtimes
+.research/
+.env
+.env.*
+!.env.example
+**/config/appstate.json
+**/nano-bridge-session.json
+**/nano-storage.json
+**/runtime-config.json
+desktop-install.json
+
+# Generated dependencies, build products and test artifacts
+node_modules/
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.tsbuildinfo
+.next/
+.turbo/
+.cache/
+dist/
+build/
+outputs/
+playwright-report/
+test-results/
+*.log
+
+# Personal footage, transcripts, model caches and generated editing projects
+*.mp4
+*.MP4
+*.mov
+*.MOV
+*.wav
+*.mp3
+footage/
+recordings/
+transcripts/
+editing-projects/
+models/
+.media/
+
+# Local editor / OS state
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

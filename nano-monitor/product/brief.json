@@ -1,0 +1,10 @@
+{
+  "name": "Nano Monitor",
+  "user": null,
+  "situation": null,
+  "promised_outcome": null,
+  "agreed_capabilities": [],
+  "excluded_capabilities": [],
+  "libraries_to_evaluate": [],
+  "infrastructure": "Supabase and Dodo credentials must be unique to this application."
+}

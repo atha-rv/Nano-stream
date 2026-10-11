@@ -1,0 +1,12 @@
+{
+  "name": "nano-monitor-desktop-build",
+  "private": true,
+  "version": "1.0.0",
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "electron": "44.7.0",
+    "@electron/packager": "20.3.0",
+    "esbuild": "0.28.2"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "template_version": 1,
+  "instructions": "Copy into each application's own review record and fill with observed evidence. Scale to the task; mark inapplicable criteria explicitly. This blank template is not a completed review.",
+  "product": null,
+  "reviewed_revision": null,
+  "scope": {"user": null, "situation": null, "promised_outcome": null, "agreed_capabilities": [], "excluded_capabilities": []},
+  "design_decision": {"chosen_interaction_model": null, "alternatives_considered": [], "reason": null, "main_remaining_tradeoff": null},
+  "reuse": [{"capability": null, "upstream": null, "version_or_revision": null, "license_checked": false, "reason_for_fit": null}],
+  "journeys": [
+    {"scenario": "First successful use", "app_specific_task": null, "expected_result": null, "evidence": [], "result": "not_checked"},
+    {"scenario": "Return and resume", "app_specific_task": null, "expected_result": null, "evidence": [], "result": "not_checked"},
+    {"scenario": "Relevant failure and recovery", "app_specific_task": null, "expected_result": null, "evidence": [], "result": "not_checked"}
+  ],
+  "checks": {
+    "capabilities_preserved": {"result": "not_checked", "evidence": []},
+    "hierarchy_and_discoverability": {"result": "not_checked", "evidence": []},
+    "realistic_content_and_states": {"result": "not_checked", "evidence": []},
+    "phone_touch_keyboard_and_navigation": {"result": "not_checked", "evidence": []},
+    "desktop_navigation_and_keyboard": {"result": "not_checked", "evidence": []},
+    "accessibility_automated_and_manual": {"result": "not_checked", "evidence": []},
+    "persistence_and_recovery": {"result": "not_checked", "evidence": []},
+    "dodo_billing_if_applicable": {"result": "not_checked", "evidence": []},
+    "performance_lab_or_field": {"result": "not_checked", "measurement_type": null, "evidence": []}
+  },
+  "environments_actually_checked": [],
+  "observed_problems_and_fixes": [],
+  "external_integrations_unverified": [],
+  "real_user_validation": {"conducted": false, "findings": [], "limits": "Developer review does not establish that new users understand the product."},
+  "remaining_issues": [],
+  "scope_additions": [],
+  "preview": null
+}

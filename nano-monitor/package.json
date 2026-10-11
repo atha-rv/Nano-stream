@@ -1,0 +1,52 @@
+{
+  "name": "nano-monitor",
+  "version": "1.0.0",
+  "private": true,
+  "sideEffects": false,
+  "engines": {
+    "node": ">=24.19.0"
+  },
+  "author": {
+    "name": "MakerKit",
+    "url": "https://makerkit.dev"
+  },
+  "scripts": {
+    "preview": "cross-env TEMPLATE_PREVIEW_ENABLED=true pnpm --filter web dev",
+    "preview:build": "pnpm --filter web with-preview next build",
+    "preview:start": "pnpm --filter web with-preview next start",
+    "check:setup": "node scripts/check-setup.mjs",
+    "create:app": "node scripts/create-app.mjs",
+    "test:foundation": "pnpm --filter web test:foundation",
+    "test:preview": "pnpm --filter web-e2e test:preview",
+    "preinstall": "pnpm run --filter scripts requirements",
+    "postinstall": "manypkg fix",
+    "build": "node scripts/check-setup.mjs --production && turbo build --cache-dir=.turbo",
+    "clean": "git clean -xdf node_modules dist .next",
+    "clean:workspaces": "turbo clean",
+    "dev": "cross-env FORCE_COLOR=1 turbo dev --parallel",
+    "lint:fix": "oxlint --fix",
+    "typecheck": "turbo typecheck --cache-dir=.turbo",
+    "test": "turbo test --cache-dir=.turbo",
+    "update": "pnpm update -r",
+    "syncpack:list": "pnpm dlx syncpack list-mismatches",
+    "syncpack:fix": "pnpm dlx syncpack fix-mismatches",
+    "supabase:web:start": "pnpm --filter web supabase:start",
+    "supabase:web:stop": "pnpm --filter web supabase:stop",
+    "supabase:web:typegen": "pnpm --filter web supabase:typegen",
+    "supabase:web:reset": "pnpm --filter web supabase:reset",
+    "lint": "oxlint",
+    "format": "oxfmt --check",
+    "format:fix": "oxfmt",
+    "healthcheck": "oxlint --fix && oxfmt && pnpm run typecheck && manypkg fix"
+  },
+  "devDependencies": {
+    "@manypkg/cli": "catalog:",
+    "@turbo/gen": "catalog:",
+    "cross-env": "catalog:",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "turbo": "catalog:",
+    "typescript": "catalog:"
+  },
+  "packageManager": "pnpm@11.19.0"
+}

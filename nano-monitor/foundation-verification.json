@@ -1,0 +1,105 @@
+{
+  "created_on": "2026-10-02",
+  "status": "local_template_ready_service_configuration_required",
+  "runtime": {
+    "node": "24.19.0",
+    "pnpm": "11.19.0",
+    "next": "16.3.8",
+    "dodo_sdk": "2.52.0"
+  },
+  "checks": {
+    "frozen_install": {
+      "result": "passed",
+      "command": "pnpm install --frozen-lockfile"
+    },
+    "typecheck": {
+      "result": "passed",
+      "command": "pnpm typecheck",
+      "tasks": 9
+    },
+    "lint": {
+      "result": "passed_with_warning",
+      "command": "pnpm lint",
+      "warning": "Inherited MFA QR-code img produces the Next.js no-img-element performance warning."
+    },
+    "production_preview_build": {
+      "result": "passed",
+      "command": "pnpm preview:build",
+      "routes": 25,
+      "note": "Production-compiled local preview; this is not a configured live deployment."
+    },
+    "billing_and_database": {
+      "result": "passed",
+      "command": "pnpm test:foundation",
+      "passed": 14,
+      "note": "PGlite runs the custom migration with stub Supabase auth roles. Tests cover RLS, event transactions, duplicates, ordering, retry, checkout leases, account deletion guards, and official SDK webhook signatures. It does not prove Supabase service behavior or multi-connection locking."
+    },
+    "dependency_audit": {
+      "result": "passed",
+      "command": "pnpm audit --json",
+      "scope": "production and development",
+      "known_advisories": 0,
+      "note": "Dated registry advisory evidence, not proof that dependencies contain no security flaws."
+    },
+    "browser_tests": {
+      "result": "passed",
+      "command": "pnpm test:preview",
+      "projects": [
+        "Desktop Chrome",
+        "Mobile Chrome (Pixel 7 emulation)",
+        "Mobile Safari (WebKit, iPhone 13 emulation)",
+        "Desktop Firefox"
+      ],
+      "limits": "Emulation and automated axe checks are not physical-device, full accessibility, or real-user validation.",
+      "passed": 40,
+      "failed": 0
+    },
+    "screenshots": {
+      "result": "reviewed",
+      "files": [
+        "outputs/desktop-workspace.png",
+        "outputs/phone-workspace.png",
+        "outputs/desktop-billing.png",
+        "outputs/phone-billing.png"
+      ],
+      "note": "Revised desktop/phone workspace and billing reviewed. Additional audit checks desktop, tablet, 390px phone, 200% text at 320px, form descriptions, touch targets and a 390x360 viewport. A constrained viewport is not a physical virtual-keyboard test."
+    },
+    "launch_configuration_guard": {
+      "result": "passed",
+      "note": "Unconfigured production setup is rejected; no secret values printed."
+    },
+    "app_creation": {
+      "result": "passed",
+      "command": "pnpm create:app --name \"Reuse verification\" --out ../.research/clone-verification-final",
+      "note": "Fresh copy verified product/brief naming, preserved license and lockfile, shared instructions/modules, generated environment defaults and output/dependency exclusions. Reusing an existing destination is rejected. The new copy also installed successfully with --frozen-lockfile."
+    }
+  },
+  "integrations_not_verified": [
+    {
+      "name": "Local Supabase authentication and service integration",
+      "reason": "Docker and Podman are not installed on this computer; test suite and Linux CI job are included."
+    },
+    {
+      "name": "Hosted Supabase, SMTP and OAuth",
+      "reason": "No app-specific service credentials/configuration connected."
+    },
+    {
+      "name": "Dodo merchant sandbox/live lifecycle",
+      "reason": "No merchant API key, webhook key, business or product connected; live checkout, portal and provider delivery remain unverified."
+    },
+    {
+      "name": "GitHub CI and deployment",
+      "reason": "Workflow included but not executed; nothing published."
+    },
+    {
+      "name": "Backups/restores, operational alerts and provider reconciliation",
+      "reason": "Require service and hosting configuration for each product."
+    }
+  ],
+  "product_quality": {
+    "real_user_study": false,
+    "physical_device_test": false,
+    "performance_field_measurements": false,
+    "note": "Shared components, standards and review rules are reusable; future apps still need a suitable interaction model and library evaluation."
+  }
+}

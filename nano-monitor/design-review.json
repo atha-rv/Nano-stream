@@ -1,0 +1,41 @@
+{
+  "product": "Nano Monitor",
+  "date": "2026-10-11",
+  "scope": "Personal Windows browser camera monitor, remote Record/Stop, original transfer after Stop; existing transfer launchers retained.",
+  "interaction_model": "Large complete camera view beside recording controls; controls below view on narrow screens; saved originals listed with explicit folder actions.",
+  "evidence": {
+    "hardware": "User confirmed 'it works'. Two app-recorded videos copied; state recorded 5,216 decoded preview frames. The 217,951,506-byte 0175 original was selected by the user for editing.",
+    "camera_to_disk": "0175 probed as 3840x2160 HEVC at 30000/1001fps with stereo 48kHz AAC; copy size matched manifest, transfer hash recorded, measured 49.6 MB/s.",
+    "desktop": "Connection initiated in 1365x900 requested viewport; initial origin-check defect observed and corrected. User exercised camera recording in the browser.",
+    "phone": "Requested 360x800 in-app viewport; actual DOM width 383 CSS pixels with scrollWidth equal to clientWidth. Inspected single-column controls, wrapped realistic filenames, and full-width 48px Record/Stop. Other controls at least 44px tall.",
+    "states": "Observed disconnected empty state, connecting, recording and saved state via hardware, then disconnected state with two real saved filenames. Stale preview is visibly labelled; bridge-offline wording exists, hardware failure recovery not fully exercised.",
+    "verification": "TypeScript check passed; Python modules compiled; launcher parsed. Unauthorized bridge GET returned 403; foreign-origin connect 403; GET start and POST state 405. Hidden cold-start launcher executed successfully and restored the app endpoint.",
+    "separate_critique": "Inspected phone screenshot after functional use: controls and connection status remain visible, long paths wrap, no horizontal overflow at observed width. Missing live view after copying is a remaining reliability issue, documented with reconnect workaround. Enlarged text and narrower effective 320px viewport are unverified."
+  },
+  "usb_storage": {
+    "date": "2026-10-11",
+    "selected": "Automatic preference: connected external USB, otherwise D:\\Osmo Nano. E: currently available with approximately 41.26 GB free; explicit D:/USB overrides retained.",
+    "research": "Reuse existing pinned MIT OsmoOffload planner/downloader, Python stdlib and Windows Storage/volume APIs. Get-Disk identifies USB SSDs as well as removable pen drives. Microsoft GetVolumeNameForVolumeMountPointW checks identity while streaming. No new dependency or formatting operation.",
+    "sources": ["https://learn.microsoft.com/en-us/powershell/module/storage/get-disk", "https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-getvolumenameforvolumemountpointw", "https://learn.microsoft.com/en-us/windows/win32/fileio/filesystem-functionality-comparison"],
+    "functional": "Nine storage tests pass, including automatic external-to-D fallback and return, explicit overrides, changed letters, replaced/unplugged drive, FAT32 limits, free space, unreadable settings/read-only rollback, legacy preference migration and keeping an active transfer pinned to its original volume. Real D: write access checked with USB inventory intentionally empty. Real USB HTTP fixture wrote/read 524,288 bytes, checked content/hash and partial finalization. Editing child confirmed cwd, TEMP/TMP, media and frame-cache paths on E:. Fixtures cleaned. TypeScript passed; Python compiled.",
+    "separate_critique": "Source review after functional checks: explicit select label, 44px select/buttons, constrained width and wrapping paths, separate Apply/Refresh, missing-volume error, change disabled during camera session, Stop remains available if drive goes missing. Each saved file opens its own stored folder. Browser inspection could not run because reload of the retained tab was rejected by the browser URL policy; no workaround was attempted. New controls' rendered phone/desktop appearance remains unverified.",
+    "limits": "Camera-to-USB hardware recording/copy, physical USB removal and full edit render on USB have not been exercised. Existing internal originals and old edit caches were not moved or removed. Editing caches redirect only for commands using edit_on_drive.py or its printed environment settings. Installed application/runtime files remain internal."
+  },
+  "desktop_app": {
+    "date": "2026-10-11",
+    "installation": "D:\\Apps\\Nano Monitor-win32-x64\\Nano Monitor.exe; desktop shortcut and updated Start Nano Monitor.cmd. Chromium profile and logs on D:\\NanoMonitor; build tooling/cache on D:\\NanoMonitorBuild. This-PC installation depends on existing workspace Python/FFmpeg runtime.",
+    "implementation": "Compiled local React UI, existing Base UI/MakerKit button primitive and Python camera core. Electron 44.7.0 MIT, Electron Packager 20.3.0 BSD-2-Clause, esbuild 0.28.2 MIT, exact lockfile and bundled license ledger retained. Native renderer sandbox/context isolation enabled, Node integration disabled; limited IPC and authenticated preview header injection keep token out of renderer. No Next.js server is launched; old owned dev server was stopped.",
+    "functional": "Packaged cold start loaded UI and automatically started its owned bridge; owned bridge exited with smoke app. IPC action/body allowlist tests passed. Nine storage tests, TypeScript and Python checks passed. Toolchain npm audit reports zero known vulnerabilities, distinct from existing web audit. Renderer version mismatch discovered and fixed by explicitly binding React/ReactDOM 19.2.8.",
+    "hardware": "Acam discovered again over BLE. Packaged app connected without recording a new clip. Live backend decoded 19 frames; native renderer reported image natural width 1280, enabled Record and no waiting overlay. Disconnect restored normal Wi-Fi and exited the owned bridge. No new camera recording or camera-to-USB Stop transfer was performed during this desktop test.",
+    "responsive": "Actual native render at 1331 and 322 CSS pixel widths. Narrow clientWidth equals scrollWidth, controls at least 44px and Record/Stop 48px. Real saved filenames/paths shown. Native-window exports manually inspected.",
+    "separate_critique": "After functional checks, inspected renderer exports: fixed CSS override hiding primary button background, moved instructions into a visible top section, preserved collapsed help when connected, checked wrapped narrow header and instructional content. Disabled-record feedback remains visible. Hidden-window live capture retained a stale waiting-overlay bitmap despite decoded image/DOM readiness, so that export is not proof of visible animated framing. The normal visible desktop app was then launched and left open; keyboard navigation, enlarged text, full long take and close-during-recording remain unverified.",
+    "remaining": "No standalone installer for other PCs or code signing; existing source/runtime must remain. Original recordings and old C: editing caches untouched. Known preview-after-copy reconnect workaround remains. Automatic approval review initially blocked the combined restart/launch command; separately scoped, verified restart and isolated launch succeeded."
+  },
+  "billing_auth": "Inapplicable to a personal loopback hardware utility; template services are not configured or deployed.",
+  "remaining_uncertainty": [
+    "Preview may stay paused after copy; reconnect to resume",
+    "Long recording/preview soak and Wi-Fi drop recovery not hardware-verified",
+    "One unpatched braces advisory in build/component tooling",
+    "Developer evidence and one user success do not establish general usability"
+  ]
+}

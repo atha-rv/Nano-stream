@@ -1,0 +1,74 @@
+/* Semantic defaults; each new product can change its visual identity here. */
+@layer base {
+  :root {
+    --background: #f7f8fa;
+    --foreground: #17202c;
+    --card: #ffffff;
+    --card-foreground: #17202c;
+    --popover: #ffffff;
+    --popover-foreground: #17202c;
+    --primary: #145d55;
+    --primary-foreground: #ffffff;
+    --muted: #edf0f3;
+    --muted-foreground: #586474;
+    --secondary: #edf0f3;
+    --secondary-foreground: #17202c;
+    --accent: #e7f0ed;
+    --accent-foreground: #145d55;
+    --border: #dce2e8;
+    --input: #798897;
+    --ring: #145d55;
+    --destructive: #b42318;
+    --radius: 0.75rem;
+  }
+  .dark {
+    --background: #121a21;
+    --foreground: #edf2f7;
+    --card: #1a242e;
+    --card-foreground: #edf2f7;
+    --popover: #1a242e;
+    --popover-foreground: #edf2f7;
+    --primary: #94ded0;
+    --primary-foreground: #122923;
+    --muted: #25323e;
+    --muted-foreground: #acb9c8;
+    --secondary: #25323e;
+    --secondary-foreground: #edf2f7;
+    --accent: #213c36;
+    --accent-foreground: #94ded0;
+    --border: #3b4a58;
+    --input: #758798;
+    --ring: #94ded0;
+    --destructive: #ffb5ad;
+  }
+  body {
+    line-height: 1.6;
+  }
+  a,
+  button,
+  input,
+  textarea {
+    touch-action: manipulation;
+  }
+  [data-slot='button'],
+  [data-slot='input'] {
+    min-height: 44px;
+  }
+  [data-slot='dialog-close'] {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 4px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

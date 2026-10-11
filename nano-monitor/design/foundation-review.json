@@ -1,0 +1,87 @@
+{
+  "product": "Reusable App Foundation prototype",
+  "reviewed_on": "2026-10-02",
+  "reviewed_revision": "Local modifications to MakerKit c5cba64391a80620309c4178163dc2df42568d1b; see foundation-manifest.json",
+  "scope": {
+    "user": "Owner creating multiple independent responsive web products",
+    "promised_outcome": "Reuse common infrastructure and start a new product without rewriting authentication, ownership and recurring billing",
+    "agreed_capabilities": [
+      "Reusable starter",
+      "Desktop and phone preview",
+      "Owned example data workflow",
+      "Supabase authentication integration",
+      "Dodo recurring billing integration",
+      "Fresh app creation",
+      "Product-specific design and OSS-first rules"
+    ],
+    "excluded_capabilities": [
+      "Native apps",
+      "A universal product layout",
+      "Real charges or fabricated account sessions in preview",
+      "Unrequested product features"
+    ]
+  },
+  "design_decision": {
+    "chosen_interaction_model": "Visible three-destination navigation, desktop project cards and compact phone rows, focused dialogs, and clear recovery screens",
+    "reason": "Makes the infrastructure inspectable and provides a working example. Future applications choose layouts for their own tasks.",
+    "main_remaining_tradeoff": "Generic sample entities and plan descriptions require replacement for a real idea."
+  },
+  "journeys": [
+    {
+      "scenario": "First successful use",
+      "result": "passed_in_preview",
+      "evidence": [
+        "Create a named project through a labeled, validated form and inspect it"
+      ]
+    },
+    {
+      "scenario": "Return and resume",
+      "result": "passed_in_preview",
+      "evidence": [
+        "Reload preserves browser-stored projects; closing an unfinished create dialog preserves its draft"
+      ]
+    },
+    {
+      "scenario": "Failure and recovery",
+      "result": "passed_in_preview",
+      "evidence": [
+        "Failed storage retains input and explains that nothing was saved; empty collection has a clear action; deletion requires confirmation"
+      ]
+    }
+  ],
+  "checks": {
+    "phone_and_desktop": "40 Playwright checks passed on production-compiled preview across desktop Chrome/Firefox and phone Chrome/WebKit emulation, including 320px reflow, 200% text, long content, missing-page recovery and short viewports",
+    "accessibility": "Input labels and actual mounted description/error references, visible success states, keyboard dismissal/return/containment, form scrolling, primary touch targets and selected axe A/AA rules checked. No physical-device or assistive-technology session conducted.",
+    "visual_review": "Desktop and phone workspace/billing screenshots reviewed; semantic light/dark tokens and touch controls used",
+    "persistence": "Preview browser persistence checked; server ownership/RLS checked in PGlite; real Supabase persistence remains unverified",
+    "billing": "SDK signature, event transaction/order/retry, expiry and ownership tests pass; no merchant sandbox lifecycle performed",
+    "performance": "Production compilation passes; no Core Web Vitals lab or field measurements"
+  },
+  "observed_problems_and_fixes": [
+    "Shared upstream form control targeted a wrapper instead of the actual input; compatibility wrapper now wires labels, descriptions and errors to the input",
+    "Programmatically opened dialogs lacked a return-focus target; explicit targets and a deletion fallback were added",
+    "Authentication entrance animation and fixed screen height complicated stable reading and small-screen layout; replaced with a stable layout that grows with content",
+    "Automated scans captured a button while leaving its loading state and a dialog during entrance; tests now wait for interactive, fully visible states",
+    "Phone layout stacked large desktop cards; replaced with compact rows preserving names, descriptions, dates and detail access",
+    "Removed repeated page eyebrows and global preview/billing notices; compact desktop navigation preserves all destinations",
+    "Create/delete status was available only to assistive technology; now also visible",
+    "200% text overflowed navigation and long control labels; wrapped navigation, labels and buttons with stable edge padding",
+    "Optional form descriptions created dangling ARIA references; registered mounted descriptions and errors in the shared wrapper",
+    "Inherited error pages had oversized headings, a mislabeled reset button and a nonexistent contact destination; replaced with clear retry/workspace recovery",
+    "Root-error page relied on missing providers and styles; replaced with independent native recovery controls",
+    "Past-due copy now distinguishes verified grace access from expired access"
+  ],
+  "external_integrations_unverified": [
+    "Supabase services and concurrent real connections",
+    "SMTP/OAuth",
+    "Dodo merchant sandbox/live delivery",
+    "Deployment, alerts, reconciliation and backups"
+  ],
+  "real_user_validation": {
+    "conducted": false,
+    "physical_devices_checked": false
+  },
+  "evidence_record": "foundation-verification.json",
+  "preview": "http://localhost:3000/preview",
+  "follow_up_audit": "ui-audit-2026-10-02.json"
+}

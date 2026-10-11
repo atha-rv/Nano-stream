@@ -1,0 +1,184 @@
+{
+  "evaluated_on": "2026-10-02",
+  "timezone": "Asia/Calcutta",
+  "scope": "Responsive desktop and phone web apps; open-source-first; Dodo Payments billing",
+  "status": "research_complete_foundation_not_yet_configured",
+  "recommendation": {
+    "base": "makerkit/nextjs-saas-starter-kit-lite",
+    "url": "https://github.com/makerkit/nextjs-saas-starter-kit-lite",
+    "revision": "c5cba64391a80620309c4178163dc2df42568d1b",
+    "root_license": "MIT",
+    "backend": "Supabase Auth, PostgreSQL, Storage; MIT JavaScript and SSR clients",
+    "ui": "Existing MakerKit/shadcn UI foundation, Tailwind, forms, tables, and Recharts",
+    "billing": {
+      "provider": "Dodo Payments",
+      "sdk": "dodopayments",
+      "sdk_version_checked": "2.52.0",
+      "sdk_license": "Apache-2.0",
+      "sdk_url": "https://github.com/dodopayments/dodopayments-typescript",
+      "docs": "https://docs.dodopayments.com/developer-resources/integration-guide",
+      "webhooks_docs": "https://docs.dodopayments.com/developer-resources/webhooks",
+      "integration_status": "not_implemented",
+      "reason_for_sdk_over_framework_adapter": "The SDK has an explicit Apache-2.0 license. The dodo-adapters repository has a GPL-3.0 root license, and its published Next.js and Better Auth package metadata omits a license. Prefer the explicitly permissive SDK for our reusable base."
+    },
+    "rationale": [
+      "Provides authentication, password reset, email verification, MFA, profile settings, account deletion, and an account schema rather than a minimal login demo.",
+      "Account and avatar storage policies in the SQL migration scope access to auth.uid(). These are useful reference policies, not a substitute for testing each new application table.",
+      "Keeps authentication and storage in the same managed backend; ordinary PostgreSQL and Next.js are broadly reusable.",
+      "Root source is MIT and billing can use Dodo's Apache-2.0 SDK.",
+      "Avoids replacing a large Stripe-centric billing model or introducing the Wasp framework and its Windows WSL requirement."
+    ],
+    "required_before_production": [
+      "Upgrade Next.js and @next/bundle-analyzer from 16.3.0; regenerate the lockfile and verify compatibility. Next.js 16.3.8 was the current stable release and returned no matching advisories in the scoped OSV query on the evaluation date.",
+      "Remove the unused @makerkit/data-loader-supabase-core and @makerkit/data-loader-supabase-nextjs dependencies and catalog entries. Their npm artifacts have no license notice; their linked source monorepo has an AGPL-3.0 root license. No source imports were found in the Lite snapshot.",
+      "Implement and test the reusable Dodo checkout, authenticated customer portal, subscription/entitlement sync, and durable duplicate-event handling.",
+      "Enable E2E CI and mobile Chrome/Mobile Safari projects. They are optional or commented out in the audited source.",
+      "Configure Supabase, OAuth/email delivery, Dodo test products and signed webhooks, deployment, secrets, backups, and runtime monitoring.",
+      "Run build, lint, type checks, account and access-isolation tests, Dodo sandbox flows, and desktop/phone usability checks."
+    ]
+  },
+  "alternatives": [
+    {
+      "repo": "wasp-lang/open-saas",
+      "url": "https://github.com/wasp-lang/open-saas",
+      "revision": "88b221e274d87c148bcb4cdd3db12cbb1b6b997e",
+      "depth": "source_license_manifest_tests_workflow_and_issue_review",
+      "verdict": "strongest_bundled_alternative_but_not_our_default",
+      "findings": [
+        "MIT root, maintained, broad auth/payment/email/upload/job/deployment features.",
+        "PaymentProcessor interface supports Stripe, Lemon Squeezy and Polar; no built-in Dodo provider at inspected revision.",
+        "Confirmed source increments credit purchases without durable event deduplication. Open issue 735 describes the same bug.",
+        "Open issues 736 and 737 cover repeat cancellation emails and webhook retry/ordering behavior.",
+        "ApexCharts dependency uses revenue-based licensing; a strictly permissive foundation should replace it with an appropriate alternative.",
+        "Windows development requires WSL; inspected Playwright config enables desktop only."
+      ],
+      "sources": [
+        "https://github.com/wasp-lang/open-saas/issues/735",
+        "https://github.com/wasp-lang/open-saas/issues/736",
+        "https://github.com/wasp-lang/open-saas/issues/737",
+        "https://apexcharts.com/license/"
+      ]
+    },
+    {
+      "repo": "nextjs/saas-starter",
+      "url": "https://github.com/nextjs/saas-starter",
+      "revision": "6e33e58b1e553a41fe22e6b941a7229a002de361",
+      "depth": "source_manifest_and_maintenance_review",
+      "verdict": "too_minimal_for_the_requested_foundation",
+      "findings": [
+        "MIT; Postgres/Drizzle, team roles, Stripe checkout and portal, email/password cookie sessions.",
+        "Inspected package.json has no test or lint script and pins a Next.js canary version.",
+        "Latest default-branch commit was December 11, 2025; not an appropriate default for minimizing maintenance and setup."
+      ]
+    },
+    {
+      "repo": "vercel/nextjs-subscription-payments",
+      "url": "https://github.com/vercel/nextjs-subscription-payments",
+      "depth": "repository_metadata",
+      "verdict": "reject_archived",
+      "findings": ["Repository archived January 23, 2025."]
+    },
+    {
+      "repo": "openstarterkit/nextjs-saas-starter-kit",
+      "url": "https://github.com/openstarterkit/nextjs-saas-starter-kit",
+      "revision": "23cf173664a81f58615a2648c44295a9e4786acc",
+      "depth": "source_manifest_billing_tests_and_workflow_review",
+      "verdict": "watchlist",
+      "findings": [
+        "MIT root; extensive auth, email, admin, billing and test features.",
+        "Created July 2026; short maintenance history and small adoption sample.",
+        "Stripe-centric implementation; repeated delivery guards rely partly on non-atomic read-before-write checks for email effects.",
+        "Requires Node >=24; inspected Next.js 16.3.5 is within a newer advisory range."
+      ]
+    },
+    {
+      "repo": "dodopayments/dodo-supabase-subscription-starter",
+      "url": "https://github.com/dodopayments/dodo-supabase-subscription-starter",
+      "depth": "source_license_manifest_and_webhook_review",
+      "verdict": "reference_only",
+      "findings": [
+        "Official minimal Dodo/Supabase subscription example; Google OAuth and subscription focus.",
+        "GPL-3.0 root license; not selected as the permissive base.",
+        "Uses Standard Webhooks signature verification; no durable webhook-event deduplication found in the inspected handler.",
+        "Cancelled and expired subscriptions take the same downgrade path, requiring review of paid-through-period semantics before reuse."
+      ]
+    },
+    {
+      "repo": "dodopayments/dodo-nextjs-minimal-boilerplate",
+      "url": "https://github.com/dodopayments/dodo-nextjs-minimal-boilerplate",
+      "depth": "repository_metadata_and_readme",
+      "verdict": "reference_only",
+      "findings": ["Minimal payments integration; GitHub repository metadata has no detected license. No blanket reuse approval inferred."]
+    },
+    {
+      "repo": "sudheerdotai/craftjs",
+      "url": "https://github.com/sudheerdotai/craftjs",
+      "depth": "source_billing_manifest_and_maintenance_review",
+      "verdict": "reject_for_billing",
+      "findings": [
+        "MIT root, but advertised Dodo integration contains TODO API calls and subscription database handlers.",
+        "verifyWebhookSignature returns true whenever a webhook secret is present; it does not validate the supplied signature.",
+        "Latest repository push January 30, 2026."
+      ],
+      "source": "https://github.com/sudheerdotai/craftjs/blob/main/packages/create-craft-app/template/src/lib/payments/dodo.ts"
+    },
+    {
+      "repo": "revokslab/shipfree",
+      "url": "https://github.com/revokslab/shipfree",
+      "revision": "94c4be7771146dcff3661584b40527d9d7b6dbcb",
+      "depth": "source_auth_payment_manifest_and_maintenance_review",
+      "verdict": "not_selected",
+      "findings": [
+        "MIT root and active repository; README claims Dodo integration.",
+        "Dodo SDK/Better Auth adapter appear in package.json, but no Dodo auth-plugin configuration or billing provider implementation found in inspected src.",
+        "Inspected package.json has no test script; importing all provider dependencies adds unnecessary maintenance."
+      ]
+    },
+    {
+      "repo": "ixartz/SaaS-Boilerplate",
+      "url": "https://github.com/ixartz/SaaS-Boilerplate",
+      "depth": "repository_metadata_and_documented_scope",
+      "verdict": "not_selected_for_this_stack",
+      "findings": ["MIT, established and maintained; Clerk-based auth and documented free-kit scope do not directly match the chosen Supabase/Dodo combination."]
+    },
+    {
+      "repo": "nextify-limited/saasfly",
+      "url": "https://github.com/nextify-limited/saasfly",
+      "depth": "repository_metadata_and_readme",
+      "verdict": "not_selected_for_maintenance",
+      "findings": ["MIT; last repository push August 4, 2025 in GitHub metadata."]
+    },
+    {
+      "repo": "anoopkarnik/saas-forge",
+      "url": "https://github.com/anoopkarnik/saas-forge",
+      "depth": "repository_metadata_and_readme",
+      "verdict": "watchlist_not_source_audited",
+      "findings": ["MIT, Dodo documented, active September 2026; insufficient independent maintenance history for the default selection in this review."]
+    }
+  ],
+  "dependency_spot_check": {
+    "service": "https://api.osv.dev/v1/querybatch",
+    "scope": "Exact-version checks of four key runtime packages, not a complete dependency audit",
+    "results": [
+      {"package": "next", "version": "16.3.0", "advisories": ["GHSA-2xp9-vwfh-vxw4", "GHSA-p293-qw3h-jr36", "GHSA-vcvr-r3jv-pc5j"]},
+      {"package": "next", "version": "16.3.8", "advisories": []},
+      {"package": "react", "version": "19.2.8", "advisories": []},
+      {"package": "@supabase/supabase-js", "version": "2.111.0", "advisories": []},
+      {"package": "dodopayments", "version": "2.52.0", "advisories": []}
+    ],
+    "limitations": "No matching advisory does not establish security. Recheck the resolved lockfile and transitive packages after updating dependencies."
+  },
+  "local_environment": {
+    "node": "22.12.0",
+    "npm": "10.9.0",
+    "docker_command_found": false,
+    "wsl_distributions_listed": false,
+    "makerkit_minimum_node": "22.13.0",
+    "status": "Source inspection only; no system installations or cloud service changes performed."
+  },
+  "verification": {
+    "performed": ["Official documentation review", "Public GitHub metadata and issue review", "Selected source and schema inspection", "Package license metadata and selected tarball license inspection", "Scoped OSV advisory queries", "Local runtime availability check"],
+    "not_performed": ["Complete transitive dependency/license audit", "Fresh dependency installation", "Local build or runtime tests", "Authenticated desktop/mobile UI verification", "Dodo sandbox integration", "Deployment or production tests"],
+    "note": "No candidate has been approved unchanged for production. This record selects a foundation for hardening; it is not a completed backend."
+  }
+}

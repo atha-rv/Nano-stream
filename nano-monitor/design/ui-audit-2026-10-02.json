@@ -1,0 +1,469 @@
+{
+  "date": "2026-10-02",
+  "trigger": "User challenged whether the prototype met the agreed UX/UI and product-ownership standard",
+  "decision": "Initial implementation passed limited functional checks but needed a separate critique; improved existing flows without new product capabilities",
+  "review": "foundation-review.json",
+  "build": "pnpm preview:build passed; 25 routes",
+  "typecheck": "9 tasks passed",
+  "browser_tests": "40 passed, 0 failed on production-compiled preview",
+  "comparisons": [
+    {
+      "case": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "before": {
+        "width": 1440,
+        "height": 1000,
+        "overflow": false,
+        "firstProjectTop": 374,
+        "firstProjectHeight": 238,
+        "lastProjectBottom": 612,
+        "primaryControls": [
+          {
+            "label": "Foundation home",
+            "width": 139,
+            "height": 44
+          },
+          {
+            "label": "Workspace",
+            "width": 108,
+            "height": 56
+          },
+          {
+            "label": "Billing",
+            "width": 72,
+            "height": 56
+          },
+          {
+            "label": "Account",
+            "width": 88,
+            "height": 56
+          },
+          {
+            "label": "New project",
+            "width": 139,
+            "height": 44
+          }
+        ]
+      },
+      "after": {
+        "width": 1440,
+        "height": 1000,
+        "overflow": false,
+        "firstProjectTop": 242,
+        "firstProjectHeight": 214,
+        "lastProjectBottom": 456,
+        "primaryControls": [
+          {
+            "label": "Foundation home",
+            "width": 139,
+            "height": 44
+          },
+          {
+            "label": "Workspace",
+            "width": 108,
+            "height": 48
+          },
+          {
+            "label": "Billing",
+            "width": 72,
+            "height": 48
+          },
+          {
+            "label": "Account",
+            "width": 88,
+            "height": 48
+          },
+          {
+            "label": "New project",
+            "width": 139,
+            "height": 44
+          }
+        ]
+      },
+      "form": {
+        "top": 332,
+        "bottom": 669,
+        "height": 337,
+        "viewportHeight": 1000,
+        "overflow": false,
+        "inputFontSize": "14px",
+        "closeTarget": {
+          "width": 44,
+          "height": 44
+        },
+        "descriptionReferencesExist": true
+      }
+    },
+    {
+      "case": "phone",
+      "width": 390,
+      "height": 664,
+      "before": {
+        "width": 390,
+        "height": 664,
+        "overflow": false,
+        "firstProjectTop": 422,
+        "firstProjectHeight": 224,
+        "lastProjectBottom": 1126,
+        "primaryControls": [
+          {
+            "label": "Foundation home",
+            "width": 139,
+            "height": 44
+          },
+          {
+            "label": "Workspace",
+            "width": 108,
+            "height": 56
+          },
+          {
+            "label": "Billing",
+            "width": 72,
+            "height": 56
+          },
+          {
+            "label": "Account",
+            "width": 88,
+            "height": 56
+          },
+          {
+            "label": "New project",
+            "width": 139,
+            "height": 44
+          }
+        ]
+      },
+      "after": {
+        "width": 390,
+        "height": 664,
+        "overflow": false,
+        "firstProjectTop": 326,
+        "firstProjectHeight": 130,
+        "lastProjectBottom": 720,
+        "primaryControls": [
+          {
+            "label": "Foundation home",
+            "width": 350,
+            "height": 44
+          },
+          {
+            "label": "Workspace",
+            "width": 108,
+            "height": 48
+          },
+          {
+            "label": "Billing",
+            "width": 72,
+            "height": 48
+          },
+          {
+            "label": "Account",
+            "width": 88,
+            "height": 48
+          },
+          {
+            "label": "New project",
+            "width": 139,
+            "height": 44
+          }
+        ]
+      },
+      "form": {
+        "top": 128,
+        "bottom": 537,
+        "height": 409,
+        "viewportHeight": 664,
+        "overflow": false,
+        "inputFontSize": "16px",
+        "closeTarget": {
+          "width": 44,
+          "height": 44
+        },
+        "descriptionReferencesExist": true
+      }
+    },
+    {
+      "case": "tablet",
+      "width": 768,
+      "height": 1024,
+      "before": {
+        "width": 768,
+        "height": 1024,
+        "overflow": false,
+        "firstProjectTop": 374,
+        "firstProjectHeight": 224,
+        "lastProjectBottom": 838,
+        "primaryControls": [
+          {
+            "label": "Foundation home",
+            "width": 139,
+            "height": 44
+          },
+          {
+            "label": "Workspace",
+            "width": 108,
+            "height": 56
+          },
+          {
+            "label": "Billing",
+            "width": 72,
+            "height": 56
+          },
+          {
+            "label": "Account",
+            "width": 88,
+            "height": 56
+          },
+          {
+            "label": "New project",
+            "width": 139,
+            "height": 44
+          }
+        ]
+      },
+      "after": {
+        "width": 768,
+        "height": 1024,
+        "overflow": false,
+        "firstProjectTop": 242,
+        "firstProjectHeight": 208,
+        "lastProjectBottom": 674,
+        "primaryControls": [
+          {
+            "label": "Foundation home",
+            "width": 139,
+            "height": 44
+          },
+          {
+            "label": "Workspace",
+            "width": 108,
+            "height": 48
+          },
+          {
+            "label": "Billing",
+            "width": 72,
+            "height": 48
+          },
+          {
+            "label": "Account",
+            "width": 88,
+            "height": 48
+          },
+          {
+            "label": "New project",
+            "width": 139,
+            "height": 44
+          }
+        ]
+      },
+      "form": {
+        "top": 344,
+        "bottom": 681,
+        "height": 337,
+        "viewportHeight": 1024,
+        "overflow": false,
+        "inputFontSize": "14px",
+        "closeTarget": {
+          "width": 44,
+          "height": 44
+        },
+        "descriptionReferencesExist": true
+      }
+    },
+    {
+      "case": "enlarged",
+      "width": 320,
+      "height": 720,
+      "before": {
+        "width": 320,
+        "height": 720,
+        "overflow": true,
+        "firstProjectTop": 1022,
+        "firstProjectHeight": 562,
+        "lastProjectBottom": 2772,
+        "primaryControls": [
+          {
+            "label": "Foundation home",
+            "width": 278,
+            "height": 88
+          },
+          {
+            "label": "Workspace",
+            "width": 216,
+            "height": 112
+          },
+          {
+            "label": "Billing",
+            "width": 145,
+            "height": 112
+          },
+          {
+            "label": "Account",
+            "width": 176,
+            "height": 112
+          },
+          {
+            "label": "New project",
+            "width": 155,
+            "height": 44
+          }
+        ]
+      },
+      "after": {
+        "width": 320,
+        "height": 720,
+        "overflow": false,
+        "firstProjectTop": 862,
+        "firstProjectHeight": 306,
+        "lastProjectBottom": 1828,
+        "primaryControls": [
+          {
+            "label": "Foundation home",
+            "width": 280,
+            "height": 88
+          },
+          {
+            "label": "Workspace",
+            "width": 216,
+            "height": 48
+          },
+          {
+            "label": "Billing",
+            "width": 145,
+            "height": 48
+          },
+          {
+            "label": "Account",
+            "width": 176,
+            "height": 48
+          },
+          {
+            "label": "New project",
+            "width": 155,
+            "height": 44
+          }
+        ]
+      },
+      "form": {
+        "top": 32,
+        "bottom": 688,
+        "height": 656,
+        "viewportHeight": 720,
+        "overflow": false,
+        "inputFontSize": "32px",
+        "closeTarget": {
+          "width": 56,
+          "height": 56
+        },
+        "descriptionReferencesExist": true
+      }
+    },
+    {
+      "case": "short-viewport",
+      "width": 390,
+      "height": 360,
+      "before": {
+        "width": 390,
+        "height": 360,
+        "overflow": false,
+        "firstProjectTop": 422,
+        "firstProjectHeight": 224,
+        "lastProjectBottom": 1126,
+        "primaryControls": [
+          {
+            "label": "Foundation home",
+            "width": 139,
+            "height": 44
+          },
+          {
+            "label": "Workspace",
+            "width": 108,
+            "height": 56
+          },
+          {
+            "label": "Billing",
+            "width": 72,
+            "height": 56
+          },
+          {
+            "label": "Account",
+            "width": 88,
+            "height": 56
+          },
+          {
+            "label": "New project",
+            "width": 139,
+            "height": 44
+          }
+        ]
+      },
+      "after": {
+        "width": 390,
+        "height": 360,
+        "overflow": false,
+        "firstProjectTop": 326,
+        "firstProjectHeight": 130,
+        "lastProjectBottom": 720,
+        "primaryControls": [
+          {
+            "label": "Foundation home",
+            "width": 350,
+            "height": 44
+          },
+          {
+            "label": "Workspace",
+            "width": 108,
+            "height": 48
+          },
+          {
+            "label": "Billing",
+            "width": 72,
+            "height": 48
+          },
+          {
+            "label": "Account",
+            "width": 88,
+            "height": 48
+          },
+          {
+            "label": "New project",
+            "width": 139,
+            "height": 44
+          }
+        ]
+      },
+      "form": {
+        "top": 16,
+        "bottom": 344,
+        "height": 328,
+        "viewportHeight": 360,
+        "overflow": false,
+        "inputFontSize": "16px",
+        "closeTarget": {
+          "width": 44,
+          "height": 44
+        },
+        "descriptionReferencesExist": true
+      }
+    }
+  ],
+  "evidence": [
+    "apps/e2e/preview-tests/foundation.spec.ts",
+    "apps/e2e/audit-quality.mjs",
+    "outputs/quality-audit-before.json",
+    "outputs/quality-audit-after.json",
+    "outputs/desktop-workspace.png",
+    "outputs/phone-workspace.png",
+    "outputs/desktop-billing.png",
+    "outputs/phone-billing.png"
+  ],
+  "limits": [
+    "Axe and Playwright do not establish a complete accessibility audit or unfamiliar-user comprehension",
+    "No physical-device, screen-reader or real virtual-keyboard session",
+    "Error-boundary recovery changes compiled and reviewed in source; only missing-page recovery was exercised through the browser",
+    "No Core Web Vitals lab/field measurements",
+    "Authenticated settings and merchant payment lifecycle require connected service credentials"
+  ],
+  "required_future_workflow": "Perform a separate product critique after functional checks; choose each product interaction model and fix observed defects before presenting it as ready"
+}

@@ -1,0 +1,32 @@
+{
+  "name": "App Foundation",
+  "created_on": "2026-10-02",
+  "upstream": {
+    "repository": "https://github.com/makerkit/nextjs-saas-starter-kit-lite",
+    "revision": "c5cba64391a80620309c4178163dc2df42568d1b",
+    "license": "MIT",
+    "modifications": [
+      "Upgraded Next.js and bundle analyzer to 16.3.8; regenerated lockfile.",
+      "Patched advisory-affected direct and transitive production/development dependencies; exact versions and overrides are locked.",
+      "Removed unused MakerKit data loader dependencies with unresolved license scope.",
+      "Added isolated preview, reusable shell, example owned data flow, and Dodo recurring billing.",
+      "Added typed schema extension, SQL ownership and billing protections, desktop/mobile QA and CI.",
+      "Adapted the shared Base UI form wrapper so labels and error descriptions target inputs; restored dialog focus and simplified responsive authentication layouts.",
+      "Audited UX beyond happy paths: compact phone collection, simpler navigation, visible confirmation, mounted ARIA references, enlarged labels, 404 recovery and independent root-error fallback. See design/ui-audit-2026-10-02.json.",
+      "Made account deletion check returned auth errors, preserve the session on failure, and respect billing guards.",
+      "Added app creation, credential checks, setup documentation and product instructions."
+    ]
+  },
+  "runtime": { "node_minimum": "24.19.0", "pnpm": "11.19.0" },
+  "billing": {
+    "sdk": "dodopayments",
+    "version": "2.52.0",
+    "license": "Apache-2.0",
+    "provider_url": "https://github.com/dodopayments/dodopayments-typescript",
+    "supported_baseline": "Ordinary recurring subscriptions and trials; one free and one configured paid product",
+    "external_service_status": "Credentials and merchant sandbox validation still required"
+  },
+  "reuse_entrypoint": "pnpm create:app --name \"My app\" --out ../my-app",
+  "preview": "http://localhost:3000/preview",
+  "scope": "Reusable foundation and local prototype; each new product still requires its own behavior, design decisions, credentials, service settings, and deployment checks"
+}
